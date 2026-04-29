@@ -3,70 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BUTTERFLY | Login</title>
+    <title>BUTTERFLY | Digital Luxury</title>
+    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
         :root {
             --bg: #fdfaf7; --text: #1c1c1c; --accent: #9b8a78;
-            --item-border: #f0f0f0;
+            --search-bg: #ece0d1; --item-border: #f0f0f0;
+            --msg-mine: #2c2c2c; --msg-other: #ffffff;
         }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; color: var(--text); }
+        [data-theme="dark"] {
+            --bg: #121212; --text: #e0e0e0; --accent: #d4a373;
+            --search-bg: #2c2c2c; --item-border: #222;
+            --msg-mine: #d4a373; --msg-other: #1a1a1a;
+        }
 
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg); margin: 0; color: var(--text); transition: 0.3s; overflow: hidden;
+        }
+
+        /* --- LOGIN SCREEN --- */
         #login-screen {
+            position: fixed; inset: 0; background: var(--bg); z-index: 1000;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 100vh; padding: 30px; text-align: center;
+            padding: 30px; text-align: center;
         }
+        .logo-login { width: 90px; border-radius: 22px; margin-bottom: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+        h2 { font-size: 26px; font-weight: 700; margin: 0 0 10px; letter-spacing: -0.5px; }
+        .login-p { font-size: 14px; color: #888; margin-bottom: 35px; max-width: 250px; }
 
-        .logo-login { width: 85px; border-radius: 22px; margin-bottom: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
-        
-        h2 { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
-        p { font-size: 14px; color: #888; margin-bottom: 35px; }
-
-        /* Estilo para el input de teléfono con bandera */
         .iti { width: 100%; max-width: 320px; margin-bottom: 20px; }
-        .iti__flag-container { padding: 2px; }
         #phone {
-            width: 100%; height: 50px; border-radius: 14px; border: 1px solid #ddd;
-            background: white; font-size: 16px; outline: none; padding-left: 50px !important;
+            width: 100%; height: 55px; border-radius: 16px; border: 1px solid #ddd;
+            background: white; font-size: 16px; outline: none;
         }
-
         .btn-verify {
-            background: var(--accent); color: white; border: none; padding: 16px;
-            border-radius: 14px; width: 100%; max-width: 320px; font-weight: bold;
+            background: var(--accent); color: white; border: none; padding: 18px;
+            border-radius: 16px; width: 100%; max-width: 320px; font-weight: 700;
             font-size: 16px; cursor: pointer; transition: 0.3s;
         }
-        .btn-verify:active { transform: scale(0.98); opacity: 0.9; }
-
-        /* Estilo del código OTP */
         #otp-input {
-            width: 100%; max-width: 320px; height: 50px; border-radius: 14px;
-            border: 1px solid var(--accent); text-align: center; font-size: 20px;
-            letter-spacing: 5px; margin-top: 15px; display: none; outline: none;
+            width: 100%; max-width: 320px; height: 55px; border-radius: 16px;
+            border: 1px solid var(--accent); text-align: center; font-size: 24px;
+            letter-spacing: 6px; margin-top: 15px; display: none; outline: none; background: white;
         }
+
+        /* --- MAIN APP --- */
+        #main-app { height: 100vh; display: flex; flex-direction: column; }
+        header { padding: 50px 20px 15px; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        h1 { font-size: 32px; font-weight: 800; margin: 0; }
+        .search-container { position: relative; margin-top: 10px; }
+        .search-input { width: 90%; background: var(--search-bg); border: none; padding: 12px 12px 12px 40px; border-radius: 18px; font-size: 15px; outline: none; }
+        .search-container i { position: absolute; left: 15px; top: 12px; color: #888; }
+
+        /* --- CHAT LIST --- */
+        .chat-list { flex: 1; overflow-y: auto; padding: 0 20px; }
+        .chat-item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid var(--item-border); cursor: pointer; }
+        .avatar { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; }
+        .chat-content h3 { margin: 0; font-size: 17px; font-weight: 600; }
+        .chat-content p { margin: 3px 0 0; font-size: 13px; color: #888; }
+
+        /* --- VIEW CHAT --- */
+        #view-chat { 
+            position: fixed; inset: 0; background: var(--bg); z-index: 500;
+            transform: translateX(100%); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column;
+        }
+        #view-chat.active { transform: translateX(0); }
+        .chat-header { padding: 45px 20px 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--item-border); background: var(--bg); }
+        #chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; }
+
+        /* MENSAJES SEDA (Blur) */
+        .msg { 
+            padding: 12px 16px; border-radius: 20px; max-width: 75%; font-size: 13px;
+            transition: 0.3s; cursor: pointer; margin-bottom: 5px; position: relative;
+        }
+        .misterio { filter: blur(8px); }
+        .revelado { filter: blur(0) !important; }
+        .mine { align-self: flex-end; background: var(--mine-bg); color: #fff; border-bottom-right-radius: 4px; }
+        .other { align-self: flex-start; background: var(--msg-other); border: 1px solid var(--item-border); color: var(--text); border-bottom-left-radius: 4px; }
+
+        footer { padding: 10px 20px 35px; display: flex; gap: 10px; align-items: center; border-top: 1px solid var(--item-border); }
+        footer input { flex: 1; border: none; background: var(--search-bg); padding: 14px 20px; border-radius: 25px; outline: none; color: var(--text); }
+        .btn-send { background: var(--accent); color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+        nav { background: var(--bg); padding: 15px 0 35px; display: flex; justify-content: space-around; border-top: 1px solid var(--item-border); }
+        nav div { text-align: center; color: #bbb; font-size: 11px; }
+        nav div.active { color: var(--accent); }
+        nav i { font-size: 22px; display: block; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
-    <img src="Logo.jpeg" class="logo-login">
-    <h2>Verifica tu número</h2>
-    <p>BUTTERFLY Group ✨ enviará un código para confirmar que eres tú.</p>
-
+    <img src="Logo.jpeg" class="logo-login" alt="Butterfly Logo">
+    <h2>BUTTERFLY</h2>
+    <p class="login-p">Ingresa tu número para recibir un código de acceso exclusivo.</p>
+    
     <input type="tel" id="phone">
-    
-    <div id="recaptcha-container" style="margin-top: 10px;"></div>
-
-    <button class="btn-verify" id="btn-action" onclick="processLogin()">Enviar código</button>
-    
+    <div id="recaptcha-container"></div>
+    <button class="btn-verify" id="btn-action" onclick="processLogin()">Continuar</button>
     <input type="text" id="otp-input" placeholder="000000" maxlength="6">
+</div>
+
+<div id="main-app" style="display:none;">
+    <header>
+        <div class="header-top">
+            <img src="Logo.jpeg" style="width:40px; border-radius:12px;">
+            <i class="fa-solid fa-moon" onclick="document.body.toggleAttribute('data-theme')" style="cursor:pointer"></i>
+        </div>
+        <h1>Chats</h1>
+        <div class="search-container">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" class="search-input" placeholder="Buscar">
+        </div>
+    </header>
+
+    <div class="chat-list">
+        <div class="chat-item" onclick="openChat()">
+            <img src="Logo.jpeg" class="avatar">
+            <div class="chat-content">
+                <h3>BUTTERFLY Group ✨</h3>
+                <p>Toca para ver los mensajes de seda...</p>
+            </div>
+        </div>
+    </div>
+
+    <nav>
+        <div class="active"><i class="fa-solid fa-comment"></i>Chats</div>
+        <div><i class="fa-solid fa-circle-notch"></i>Status</div>
+        <div><i class="fa-solid fa-gear"></i>Settings</div>
+    </nav>
+</div>
+
+<div id="view-chat">
+    <div class="chat-header">
+        <i class="fa-solid fa-arrow-left" onclick="closeChat()"></i>
+        <img src="Logo.jpeg" style="width:40px; height:40px; border-radius:12px;">
+        <div style="flex:1"><h3 style="margin:0; font-size:16px;">BUTTERFLY Group</h3><span style="font-size:11px; color:#9b8a78;">Luxury Mode</span></div>
+    </div>
+    <div id="chat-box"></div>
+    <footer>
+        <input type="text" id="msgInput" placeholder="Mensaje discreto..." autocomplete="off">
+        <div class="btn-send" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></div>
+    </footer>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCpbEqoc9-lgVna4c8SsdUimZLQGjSN3gE",
@@ -79,45 +170,73 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
+    const messagesCol = collection(db, "messages");
 
-    // INICIALIZAR LAS BANDERAS
+    // Configuración de Banderas
     const phoneInput = document.querySelector("#phone");
     const iti = window.intlTelInput(phoneInput, {
-        initialCountry: "py", // Paraguay por defecto 🇵🇾
-        preferredCountries: ["py", "ar", "br", "es"],
-        separateDialCode: true, // Esto separa el +595 del número
+        initialCountry: "py",
+        separateDialCode: true,
         utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
     });
 
-    let step = 1; // 1: Enviar SMS, 2: Verificar OTP
-
-    window.processLogin = async function() {
-        const btn = document.getElementById('btn-action');
-        
-        if (step === 1) {
-            const phoneNumber = iti.getNumber(); // Obtiene el número completo (+595981...)
-            if (!phoneNumber) return alert("Ingresa un número válido");
-
-            const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'invisible' });
-            
-            try {
-                window.confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
-                document.getElementById('phone').style.display = 'none';
-                document.querySelector('.iti').style.display = 'none'; // Oculta el selector de banderas
-                document.getElementById('otp-input').style.display = 'block';
-                btn.innerText = "Verificar código";
-                step = 2;
-            } catch (error) {
-                alert("Error al enviar: " + error.message);
-            }
+    // Lógica de Login
+    let step = 1;
+    window.processLogin = async () => {
+        if(step === 1) {
+            const num = iti.getNumber();
+            if(!num) return alert("Número inválido");
+            const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
+            window.confirmResult = await signInWithPhoneNumber(auth, num, verifier);
+            document.querySelector('.iti').style.display = 'none';
+            document.getElementById('otp-input').style.display = 'block';
+            document.getElementById('btn-action').innerText = "Verificar";
+            step = 2;
         } else {
             const code = document.getElementById('otp-input').value;
-            window.confirmationResult.confirm(code).then(() => {
-                alert("¡Bienvenida a BUTTERFLY! ✨");
-                window.location.href = "chat.html"; // O la parte de tu app
-            }).catch(() => alert("Código incorrecto"));
+            window.confirmResult.confirm(code).catch(() => alert("Código errado"));
         }
-    }
+    };
+
+    onAuthStateChanged(auth, user => {
+        if(user) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'flex';
+        }
+    });
+
+    // Chat
+    window.openChat = () => document.getElementById('view-chat').classList.add('active');
+    window.closeChat = () => document.getElementById('view-chat').classList.remove('active');
+
+    window.sendMessage = async () => {
+        const input = document.getElementById('msgInput');
+        if(input.value.trim()){
+            await addDoc(messagesCol, { 
+                text: input.value, 
+                user: auth.currentUser.phoneNumber, 
+                createdAt: serverTimestamp(),
+                misterio: true 
+            });
+            input.value = "";
+        }
+    };
+
+    onSnapshot(query(messagesCol, orderBy("createdAt", "asc")), (snap) => {
+        const box = document.getElementById('chat-box');
+        box.innerHTML = "";
+        snap.forEach(doc => {
+            const msg = doc.data();
+            const isMine = msg.user === auth.currentUser?.phoneNumber;
+            const div = document.createElement('div');
+            div.className = `msg ${isMine ? 'mine' : 'other'} ${msg.misterio ? 'misterio' : ''}`;
+            div.innerText = msg.text;
+            div.onclick = () => div.classList.toggle('revelado');
+            box.appendChild(div);
+        });
+        box.scrollTop = box.scrollHeight;
+    });
 </script>
 </body>
 </html>
