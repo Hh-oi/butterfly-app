@@ -11,10 +11,10 @@
     <link rel="icon" href="Logo.jpeg">
 
     <style>
-        /* Estética Minimalista y Sofisticada */
+        /* Estética Minimalista y Sofisticada (Quiet Luxury) */
         body { 
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background-color: #fdfaf7; /* Tono crema suave */
+            background-color: #fdfaf7; 
             margin: 0; 
             display: flex; 
             flex-direction: column; 
@@ -57,10 +57,9 @@
             padding: 10px 14px; 
             border-radius: 15px; 
             max-width: 75%; 
-            font-size: 0.8rem; /* Fuente pequeña y discreta */
+            font-size: 0.8rem; 
             line-height: 1.4;
             letter-spacing: 0.2px;
-            position: relative;
         }
         
         .user-name { 
@@ -69,7 +68,7 @@
             margin-bottom: 3px; 
             display: block; 
             text-transform: lowercase;
-            color: #9b8a78; /* Tono arena */
+            color: #9b8a78; 
         }
         
         .other { 
@@ -82,7 +81,7 @@
         
         .mine { 
             align-self: flex-end; 
-            background: #2c2c2c; /* Negro elegante */
+            background: #2c2c2c; 
             color: #fdfaf7; 
             border-bottom-right-radius: 2px; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -140,7 +139,6 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // Tu configuración de Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyCpbEqoc9-lgVna4c8SsdUimZLQGjSN3gE",
     authDomain: "butterfly-2f1ba.firebaseapp.com",
@@ -155,32 +153,21 @@
   const db = getFirestore(app);
   const messagesCol = collection(db, "messages");
 
-  // Manejo de usuario
   let usuario = localStorage.getItem('chat_user') || prompt("Dime tu nombre:") || "usuario";
   localStorage.setItem('chat_user', usuario);
 
-  // Función para enviar mensajes
   const sendAction = async () => {
       const input = document.getElementById('msgInput');
       if(input.value.trim() !== "") {
           const text = input.value;
           input.value = "";
-          try {
-              await addDoc(messagesCol, { 
-                  text, 
-                  user: usuario, 
-                  createdAt: serverTimestamp() 
-              });
-          } catch (e) {
-              console.error("Error al enviar:", e);
-          }
+          await addDoc(messagesCol, { text, user: usuario, createdAt: serverTimestamp() });
       }
   };
 
   document.getElementById('sendBtn').onclick = sendAction;
   document.getElementById('msgInput').onkeypress = (e) => { if(e.key === 'Enter') sendAction(); };
 
-  // Escuchar mensajes en tiempo real
   onSnapshot(query(messagesCol, orderBy("createdAt", "asc")), (snapshot) => {
       const box = document.getElementById('chat-box');
       box.innerHTML = "";
@@ -195,6 +182,13 @@
       });
       box.scrollTop = box.scrollHeight;
   });
+
+  // REGISTRO DEL SERVICE WORKER (Para activar el botón de instalar)
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(err => console.log(err));
+    });
+  }
 </script>
 
 </body>
