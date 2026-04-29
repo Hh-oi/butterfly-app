@@ -1,35 +1,24 @@
-const CACHE_NAME = 'butterfly-v1';
-const ASSETS = [
+const CACHE_NAME = 'butterfly-v2';
+const assets = [
   './',
   './index.html',
   './manifest.json',
   './Logo.jpeg'
 ];
 
-// Instalar el Service Worker
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then(cache => cache.addAll(assets))
   );
 });
 
-// Activar y limpiar caches antiguos
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys => {
-      return Promise.all(keys
-        .filter(key => key !== CACHE_NAME)
-        .map(key => caches.delete(key))
-      );
-    })
-  );
+  event.waitUntil(clients.claim());
 });
 
-// Responder desde la cache cuando no hay internet
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request)
-      .then(response => response || fetch(event.request))
+    fetch(event.request).catch(() => caches.match(event.request))
   );
 });
