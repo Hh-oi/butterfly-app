@@ -1,6 +1,10 @@
 {
+  "name": "BUTTERFLY Luxury Chat",
   "short_name": "BUTTERFLY",
-  "name": "BUTTERFLY Chat",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#fdfaf7",
+  "theme_color": "#9b8a78",
   "icons": [
     {
       "src": "Logo.jpeg",
@@ -12,9 +16,5 @@
       "sizes": "512x512",
       "type": "image/jpeg"
     }
-  ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#fdfaf7",
-  "background_color": "#fdfaf7"
+  ]
 }
