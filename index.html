@@ -7,41 +7,66 @@
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --accent: #2c2c2c; --bg: #fdfaf7; --crema: #ece0d1; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: #333; overflow: hidden; }
+        /* Variables de color para ambos modos */
+        :root {
+            --bg: #fdfaf7;
+            --header-bg: #ffffff;
+            --text: #2c2c2c;
+            --accent: #9b8a78;
+            --search: #ece0d1;
+            --item-border: #eee;
+            --mine-bg: #2c2c2c;
+            --mine-text: #fdfaf7;
+        }
+
+        /* Colores del Modo Oscuro */
+        [data-theme="dark"] {
+            --bg: #121212;
+            --header-bg: #1a1a1a;
+            --text: #e0e0e0;
+            --accent: #d4a373;
+            --search: #2c2c2c;
+            --item-border: #333;
+            --mine-bg: #d4a373;
+            --mine-text: #121212;
+        }
+
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: var(--text); overflow: hidden; transition: 0.3s; }
         
-        /* PANTALLA DE LISTA */
-        #view-list { height: 100vh; display: flex; flex-direction: column; transition: 0.3s; }
+        /* HEADER */
         header { padding: 40px 20px 10px; background: var(--bg); }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .logo-small { width: 35px; height: 35px; border-radius: 10px; object-fit: cover; }
         h1 { font-size: 28px; font-weight: 700; margin: 0; }
-        .search-bar { background: var(--crema); border-radius: 12px; padding: 10px; display: flex; align-items: center; gap: 10px; margin: 15px 0; }
-        .search-bar input { border: none; background: transparent; outline: none; flex: 1; font-size: 16px; }
+        
+        /* BOTÓN LUNA/SOL */
+        .theme-toggle { font-size: 20px; cursor: pointer; color: var(--text); padding: 5px; }
+
+        .search-bar { background: var(--search); border-radius: 12px; padding: 10px; display: flex; align-items: center; gap: 10px; margin: 15px 0; }
+        .search-bar input { border: none; background: transparent; outline: none; flex: 1; font-size: 16px; color: var(--text); }
+        
         .chat-list { flex: 1; overflow-y: auto; padding: 0 20px; }
-        .chat-item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid #eee; cursor: pointer; }
-        .avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; background: #eee; }
-        .chat-info { flex: 1; }
-        .chat-info h3 { margin: 0; font-size: 15px; font-weight: 600; }
+        .chat-item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid var(--item-border); cursor: pointer; }
+        .avatar { width: 52px; height: 52px; border-radius: 12px; object-fit: cover; background: #eee; }
+        .chat-info h3 { margin: 0; font-size: 15px; }
         .chat-info p { margin: 3px 0 0; font-size: 13px; color: #888; }
         
-        /* PANTALLA DE CHAT (OCULTA POR DEFECTO) */
+        /* VENTANA CHAT */
         #view-chat { position: fixed; top: 0; right: -100%; width: 100%; height: 100vh; background: var(--bg); display: flex; flex-direction: column; transition: 0.4s ease; z-index: 200; }
         #view-chat.active { right: 0; }
-        .chat-header { padding: 45px 20px 15px; background: #fff; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px; }
+        .chat-header { padding: 45px 20px 15px; background: var(--header-bg); border-bottom: 1px solid var(--item-border); display: flex; align-items: center; gap: 15px; }
         #chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
         
-        /* BURBUJAS */
-        .msg { padding: 10px 14px; border-radius: 18px; max-width: 75%; font-size: 0.85rem; line-height: 1.4; }
-        .mine { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 2px; }
-        .other { align-self: flex-start; background: #fff; border: 1px solid #eee; border-bottom-left-radius: 2px; }
+        .msg { padding: 10px 14px; border-radius: 18px; max-width: 75%; font-size: 0.85rem; }
+        .mine { align-self: flex-end; background: var(--mine-bg); color: var(--mine-text); border-bottom-right-radius: 2px; }
+        .other { align-self: flex-start; background: var(--header-bg); border: 1px solid var(--item-border); color: var(--text); border-bottom-left-radius: 2px; }
 
-        footer { padding: 15px; background: #fff; border-top: 1px solid #eee; display: flex; gap: 10px; align-items: center; }
-        footer input { flex: 1; border: none; background: var(--bg); padding: 12px 18px; border-radius: 25px; outline: none; }
+        footer { padding: 15px; background: var(--header-bg); border-top: 1px solid var(--item-border); display: flex; gap: 10px; align-items: center; }
+        footer input { flex: 1; border: none; background: var(--bg); padding: 12px 18px; border-radius: 25px; outline: none; color: var(--text); }
         
-        nav { background: #fff; padding: 15px; display: flex; justify-content: space-around; border-top: 1px solid #eee; }
-        nav i { font-size: 18px; color: #bbb; }
-        .btn-send { color: var(--accent); font-weight: 700; cursor: pointer; font-size: 0.8rem; text-transform: uppercase; }
+        nav { background: var(--header-bg); padding: 15px; display: flex; justify-content: space-around; border-top: 1px solid var(--item-border); }
+        nav i { font-size: 20px; color: #bbb; }
+        .btn-send { color: var(--accent); font-weight: 700; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -50,7 +75,9 @@
     <header>
         <div class="header-top">
             <img src="Logo.jpeg" class="logo-small">
-            <i class="fa-regular fa-pen-to-square"></i>
+            <div class="theme-toggle" id="themeBtn">
+                <i class="fa-solid fa-moon"></i>
+            </div>
         </div>
         <h1>Chats</h1>
         <div class="search-bar">
@@ -59,10 +86,12 @@
         </div>
     </header>
     <div class="chat-list">
-        <div class="chat-item" onclick="openChat('Grupo General')">
+        <div class="chat-item" onclick="openChat('BUTTERFLY Group')">
             <img src="Logo.jpeg" class="avatar">
-            <div class="chat-info"><h3>BUTTERFLY Chat</h3><p>Toca para entrar al grupo...</p></div>
-            <div style="text-align:right"><span style="font-size:10px; color:#aaa">Ahora</span></div>
+            <div class="chat-info">
+                <h3>BUTTERFLY Chat</h3>
+                <p>Toca para ver los mensajes...</p>
+            </div>
         </div>
     </div>
     <nav>
@@ -74,8 +103,8 @@
 
 <div id="view-chat">
     <div class="chat-header">
-        <i class="fa-solid fa-chevron-left" onclick="closeChat()" style="cursor:pointer"></i>
-        <img src="Logo.jpeg" style="width:35px; height:35px; border-radius:50%">
+        <i class="fa-solid fa-chevron-left" onclick="closeChat()"></i>
+        <img src="Logo.jpeg" style="width:35px; height:35px; border-radius:8px;">
         <h3 id="chat-title" style="font-size:16px; margin:0">Chat</h3>
     </div>
     <div id="chat-box"></div>
@@ -102,7 +131,20 @@
   const db = getFirestore(app);
   const messagesCol = collection(db, "messages");
 
-  let usuario = localStorage.getItem('chat_user') || prompt("Dime tu nombre:") || "Usuario";
+  // MODO OSCURO LOGIC
+  const themeBtn = document.getElementById('themeBtn');
+  themeBtn.onclick = () => {
+      const current = document.body.getAttribute('data-theme');
+      if(current === 'dark') {
+          document.body.removeAttribute('data-theme');
+          themeBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+      } else {
+          document.body.setAttribute('data-theme', 'dark');
+          themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+      }
+  };
+
+  let usuario = localStorage.getItem('chat_user') || prompt("Dime tu nombre:") || "Invitado";
   localStorage.setItem('chat_user', usuario);
 
   window.openChat = (name) => {
@@ -132,7 +174,7 @@
           const isMine = msg.user === usuario;
           const div = document.createElement('div');
           div.className = `msg ${isMine ? 'mine' : 'other'}`;
-          div.innerHTML = `<span style="font-size:10px; opacity:0.7; display:block">${msg.user}</span>${msg.text}`;
+          div.innerHTML = `<span style="font-size:10px; opacity:0.7; display:block; margin-bottom:2px">${msg.user}</span>${msg.text}`;
           box.appendChild(div);
       });
       box.scrollTop = box.scrollHeight;
