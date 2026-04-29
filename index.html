@@ -4,184 +4,109 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BUTTERFLY</title>
-    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --bg: #fdfaf7; --header-bg: #ffffff; --text: #2c2c2c;
-            --accent: #9b8a78; --search: #ece0d1; --item-border: #eee;
-            --mine-bg: #2c2c2c; --mine-text: #fdfaf7;
+            --bg: #fdfaf7; --text: #1c1c1c; --accent: #9b8a78;
+            --search-bg: #ece0d1; --item-border: #f0f0f0;
+            --tab-inactive: #b0b0b0;
         }
         [data-theme="dark"] {
-            --bg: #121212; --header-bg: #1a1a1a; --text: #e0e0e0;
-            --accent: #d4a373; --search: #2c2c2c; --item-border: #333;
-            --mine-bg: #d4a373; --mine-text: #121212;
+            --bg: #121212; --text: #e0e0e0; --accent: #d4a373;
+            --search-bg: #2c2c2c; --item-border: #222;
         }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: var(--text); overflow: hidden; transition: 0.3s; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); margin: 0; color: var(--text); transition: 0.3s; }
         
-        /* HEADER */
-        header { padding: 40px 20px 10px; background: var(--bg); }
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .logo-small { width: 38px; height: 38px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h1 { font-size: 30px; font-weight: 700; margin: 0; }
-        .theme-toggle { font-size: 20px; cursor: pointer; color: var(--text); padding: 5px; }
+        /* LOGIN STYLE */
+        #login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; }
+        .btn-verify { background: var(--accent); color: white; border: none; padding: 15px; border-radius: 15px; width: 100%; max-width: 280px; font-weight: bold; cursor: pointer; margin-top: 15px; }
 
-        /* BUSCADOR */
-        .search-bar { background: var(--search); border-radius: 15px; padding: 12px; display: flex; align-items: center; gap: 10px; margin: 15px 0; }
-        .search-bar input { border: none; background: transparent; outline: none; flex: 1; font-size: 16px; color: var(--text); }
+        /* APP HEADER */
+        header { padding: 50px 20px 10px; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .logo-main { width: 45px; height: 45px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h1 { font-size: 32px; margin: 0; font-weight: 800; }
         
-        /* LISTA */
-        .chat-list { flex: 1; overflow-y: auto; padding: 0 20px; }
+        .search-container { position: relative; margin-bottom: 25px; }
+        .search-container i { position: absolute; left: 15px; top: 12px; color: #888; }
+        .search-input { width: 90%; background: var(--search-bg); border: none; padding: 12px 12px 12px 40px; border-radius: 18px; font-size: 16px; outline: none; }
+
+        /* CHAT LIST */
+        .chat-list { padding: 0 20px; overflow-y: auto; flex: 1; }
         .chat-item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid var(--item-border); cursor: pointer; }
-        .avatar { width: 55px; height: 55px; border-radius: 14px; object-fit: cover; background: #eee; }
-        
-        /* VENTANA CHAT */
-        #view-chat { position: fixed; top: 0; right: -100%; width: 100%; height: 100vh; background: var(--bg); display: flex; flex-direction: column; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 200; }
+        .avatar { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; }
+        .chat-content { flex: 1; }
+        .chat-content h3 { margin: 0; font-size: 17px; font-weight: 600; }
+        .chat-content p { margin: 4px 0 0; font-size: 14px; color: #888; }
+        .chat-meta { text-align: right; font-size: 12px; color: #bbb; }
+
+        /* NAVIGATION BAR */
+        nav { background: white; padding: 15px 0 35px; display: flex; justify-content: space-around; border-top: 1px solid var(--item-border); position: fixed; bottom: 0; width: 100%; }
+        [data-theme="dark"] nav { background: #1a1a1a; }
+        nav div { text-align: center; color: var(--tab-inactive); font-size: 11px; cursor: pointer; }
+        nav div.active { color: var(--accent); }
+        nav i { font-size: 22px; display: block; margin-bottom: 4px; }
+
+        /* VIEW CHAT */
+        #view-chat { position: fixed; top: 0; right: -100%; width: 100%; height: 100vh; background: var(--bg); z-index: 500; transition: 0.4s; display: flex; flex-direction: column; }
         #view-chat.active { right: 0; }
-        .chat-header { padding: 45px 20px 15px; background: var(--header-bg); border-bottom: 1px solid var(--item-border); display: flex; align-items: center; gap: 15px; }
-        #chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-        
-        /* BURBUJAS */
-        .msg { padding: 12px 16px; border-radius: 20px; max-width: 80%; font-size: 0.9rem; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
-        .mine { align-self: flex-end; background: var(--mine-bg); color: var(--mine-text); border-bottom-right-radius: 4px; }
-        .other { align-self: flex-start; background: var(--header-bg); border: 1px solid var(--item-border); color: var(--text); border-bottom-left-radius: 4px; }
-        .msg-info { font-size: 10px; opacity: 0.6; margin-bottom: 4px; font-weight: 600; }
-        .msg-img { max-width: 100%; border-radius: 12px; margin-top: 5px; display: block; }
-
-        /* BARRA EMOJIS */
-        .emoji-bar { display: flex; gap: 15px; padding: 10px 20px; background: var(--header-bg); border-top: 1px solid var(--item-border); overflow-x: auto; }
-        .emoji-item { cursor: pointer; font-size: 20px; }
-
-        footer { padding: 10px 15px 30px; background: var(--header-bg); display: flex; gap: 10px; align-items: center; }
-        footer input { flex: 1; border: none; background: var(--search); padding: 14px 20px; border-radius: 30px; outline: none; color: var(--text); font-size: 16px; }
-        
-        nav { background: var(--header-bg); padding: 15px 15px 30px; display: flex; justify-content: space-around; border-top: 1px solid var(--item-border); }
-        nav i { font-size: 22px; color: #bbb; }
-        .btn-send { background: var(--accent); color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div id="view-list">
-    <header>
-        <div class="header-top">
-            <img src="Logo.jpeg" class="logo-small">
-            <div class="theme-toggle" id="themeBtn"><i class="fa-solid fa-moon"></i></div>
-        </div>
-        <h1>Chats</h1>
-        <div class="search-bar">
-            <i class="fa-solid fa-magnifying-glass" style="color: #888;"></i>
-            <input type="text" id="mainSearch" placeholder="Buscar mensajes...">
-        </div>
-    </header>
-    <div class="chat-list" id="listContainer">
-        <div class="chat-item" onclick="openChat('BUTTERFLY Group ✨')">
-            <img src="Logo.jpeg" class="avatar">
-            <div class="chat-info">
-                <h3>BUTTERFLY Group ✨</h3>
-                <p id="lastMsgPreview">Entra para chatear...</p>
-            </div>
-        </div>
-    </div>
-    <nav><i class="fa-solid fa-message" style="color:var(--accent)"></i><i class="fa-solid fa-users"></i><i class="fa-solid fa-gear"></i></nav>
+<div id="login-screen">
+    <img src="Logo.jpeg" style="width: 80px; border-radius: 20px; margin-bottom: 20px;">
+    <h2>Verifica tu número</h2>
+    <input type="text" id="phone" style="width: 250px; padding: 15px; border-radius: 12px; border: 1px solid #ddd;" placeholder="+595 9xx xxx xxx">
+    <div id="recaptcha-container" style="margin-top: 10px;"></div>
+    <button class="btn-verify" onclick="sendOTP()">Continuar</button>
 </div>
 
-<div id="view-chat">
-    <div class="chat-header">
-        <i class="fa-solid fa-arrow-left" onclick="closeChat()"></i>
-        <img src="Logo.jpeg" style="width:40px; height:40px; border-radius:10px;">
-        <div style="flex:1"><h3 id="chat-title" style="font-size:16px; margin:0">Chat</h3><span style="font-size:11px; color:#4CAF50;">en línea</span></div>
+<div id="main-app" style="display:none; height: 100vh; display: flex; flex-direction: column;">
+    <header>
+        <div class="header-top">
+            <img src="Logo.jpeg" class="logo-main">
+            <div onclick="document.body.toggleAttribute('data-theme')" style="font-size: 20px; cursor:pointer">
+                <i class="fa-solid fa-moon"></i>
+            </div>
+        </div>
+        <h1>Chats</h1>
+        <div class="search-container">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" class="search-input" placeholder="Search">
+        </div>
+    </header>
+
+    <div class="chat-list">
+        <div class="chat-item" onclick="openChat('Leidyd')">
+            <img src="https://i.pravatar.cc/150?u=leidyd" class="avatar">
+            <div class="chat-content">
+                <h3>Leidyd</h3>
+                <p>Hey, message, you'res had...</p>
+            </div>
+            <div class="chat-meta">7:06 PM</div>
+        </div>
+        <div class="chat-item" onclick="openChat('Sirvina')">
+            <img src="https://i.pravatar.cc/150?u=sirvina" class="avatar">
+            <div class="chat-content">
+                <h3>Sirvina</h3>
+                <p>Message all mand message...</p>
+            </div>
+            <div class="chat-meta">2:08 PM</div>
+        </div>
     </div>
-    <div id="chat-box"></div>
-    <div class="emoji-bar">
-        <span class="emoji-item" onclick="addEmoji('🦋')">🦋</span>
-        <span class="emoji-item" onclick="addEmoji('✨')">✨</span>
-        <span class="emoji-item" onclick="addEmoji('🧉')">🧉</span>
-        <span class="emoji-item" onclick="addEmoji('🤍')">🤍</span>
-    </div>
-    <footer>
-        <input type="text" id="msgInput" placeholder="Escribe o pega link de foto..." autocomplete="off">
-        <div class="btn-send" id="sendBtn"><i class="fa-solid fa-paper-plane"></i></div>
-    </footer>
+
+    <nav>
+        <div class="active"><i class="fa-solid fa-comment"></i>Chats</div>
+        <div><i class="fa-solid fa-address-book"></i>Contacts</div>
+        <div><i class="fa-solid fa-gear"></i>Settings</div>
+    </nav>
 </div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCpbEqoc9-lgVna4c8SsdUimZLQGjSN3gE",
-    authDomain: "butterfly-2f1ba.firebaseapp.com",
-    projectId: "butterfly-2f1ba",
-    storageBucket: "butterfly-2f1ba.firebasestorage.app",
-    messagingSenderId: "668042697742",
-    appId: "1:668042697742:web:655b9d4ba13088d58ef05f"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const messagesCol = collection(db, "messages");
-
-  // MODO OSCURO
-  const themeBtn = document.getElementById('themeBtn');
-  themeBtn.onclick = () => {
-      const isDark = document.body.hasAttribute('data-theme');
-      document.body.toggleAttribute('data-theme');
-      themeBtn.innerHTML = isDark ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
-  };
-
-  let usuario = localStorage.getItem('chat_user') || prompt("Tu nombre:") || "Invitada";
-  localStorage.setItem('chat_user', usuario);
-
-  window.openChat = (name) => { document.getElementById('view-chat').classList.add('active'); };
-  window.closeChat = () => { document.getElementById('view-chat').classList.remove('active'); };
-  window.addEmoji = (e) => { document.getElementById('msgInput').value += e; document.getElementById('msgInput').focus(); };
-
-  const sendAction = async () => {
-      const input = document.getElementById('msgInput');
-      if(input.value.trim() !== "") {
-          const text = input.value; input.value = "";
-          await addDoc(messagesCol, { text, user: usuario, createdAt: serverTimestamp() });
-      }
-  };
-  document.getElementById('sendBtn').onclick = sendAction;
-  document.getElementById('msgInput').onkeypress = (e) => { if(e.key === 'Enter') sendAction(); };
-
-  // BUSCADOR FUNCIONAL
-  let allMessages = [];
-  document.getElementById('mainSearch').oninput = (e) => {
-      const term = e.target.value.toLowerCase();
-      renderMessages(allMessages.filter(m => m.text.toLowerCase().includes(term)));
-  };
-
-  function renderMessages(msgs) {
-      const box = document.getElementById('chat-box');
-      box.innerHTML = "";
-      msgs.forEach(msg => {
-          const isMine = msg.user === usuario;
-          const div = document.createElement('div');
-          div.className = `msg ${isMine ? 'mine' : 'other'}`;
-          let html = `<div class="msg-info">${msg.user}</div>`;
-          
-          // DETECTAR SI ES LINK DE IMAGEN
-          if(msg.text.match(/\.(jpeg|jpg|gif|png|webp)$/) != null || msg.text.includes('images.unsplash.com')) {
-              html += `<img src="${msg.text}" class="msg-img" onclick="window.open('${msg.text}')">`;
-          } else {
-              html += msg.text;
-          }
-          div.innerHTML = html;
-          box.appendChild(div);
-      });
-      box.scrollTop = box.scrollHeight;
-  }
-
-  onSnapshot(query(messagesCol, orderBy("createdAt", "asc")), (snapshot) => {
-      allMessages = snapshot.docs.map(doc => doc.data());
-      if(allMessages.length > 0) document.getElementById('lastMsgPreview').innerText = allMessages[allMessages.length-1].text;
-      renderMessages(allMessages);
-  });
-
-  if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
+    // Aquí va tu lógica de Firebase que ya tienes del paso anterior
+    // Recuerda que 'main-app' se muestra solo después de verificar el teléfono.
+    window.openChat = (name) => alert("Abriendo chat con " + name);
 </script>
 </body>
 </html>
