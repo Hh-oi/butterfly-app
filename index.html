@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUTTERFLY - Messenger</title>
+    <style>
+        /* Estética minimalista y discreta */
+        body { font-family: sans-serif; background-color: #f9f9f9; margin: 0; display: flex; flex-direction: column; h-100vh; }
+        header { background: #fff; padding: 15px; border-bottom: 1px solid #eee; text-align: center; font-size: 0.9rem; font-weight: bold; letter-spacing: 1px; }
+        #chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .message { background: #fff; padding: 8px 12px; border-radius: 12px; max-width: 70%; font-size: 0.85rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .mine { align-self: flex-end; background: #000; color: #fff; }
+        footer { padding: 15px; background: #fff; border-top: 1px solid #eee; display: flex; gap: 10px; }
+        input { flex: 1; border: 1px solid #ddd; padding: 8px; border-radius: 20px; outline: none; font-size: 0.8rem; }
+        button { background: none; border: none; font-weight: bold; cursor: pointer; color: #555; }
+    </style>
+</head>
+<body>
+
+<header>BUTTERFLY</header>
+
+<div id="chat-box">
+    <div class="message">¡Bienvenida! Este es el inicio de algo grande.</div>
+    <div class="message mine">Mensaje de prueba elegante.</div>
+</div>
+
+<footer>
+    <input type="text" id="msgInput" placeholder="Escribe un mensaje...">
+    <button onclick="sendMessage()">Enviar</button>
+</footer>
+
+<script>
+    function sendMessage() {
+        const input = document.getElementById('msgInput');
+        if(input.value !== "") {
+            const box = document.getElementById('chat-box');
+            const newMsg = document.createElement('div');
+            newMsg.className = 'message mine';
+            newMsg.textContent = input.value;
+            box.appendChild(newMsg);
+            input.value = "";
+            box.scrollTop = box.scrollHeight;
+        }
+    }
+</script>
+
+</body>
+</html>
