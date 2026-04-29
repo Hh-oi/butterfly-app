@@ -3,110 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BUTTERFLY</title>
+    <title>BUTTERFLY | Luxury Chat</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --bg: #fdfaf7; --text: #1c1c1c; --accent: #9b8a78;
             --search-bg: #ece0d1; --item-border: #f0f0f0;
-            --tab-inactive: #b0b0b0;
+            --msg-mine: #2c2c2c; --msg-other: #ffffff;
         }
         [data-theme="dark"] {
             --bg: #121212; --text: #e0e0e0; --accent: #d4a373;
             --search-bg: #2c2c2c; --item-border: #222;
+            --msg-mine: #d4a373; --msg-other: #1a1a1a;
         }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); margin: 0; color: var(--text); transition: 0.3s; }
+
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg); margin: 0; color: var(--text); 
+            transition: 0.3s; overflow: hidden;
+        }
+
+        /* DISEÑO DE MENSAJES "SEDA" (Blur) */
+        .msg { 
+            padding: 10px 14px; border-radius: 18px; max-width: 75%; 
+            font-size: 13px; /* Fuente pequeña y discreta */
+            line-height: 1.4; position: relative;
+            transition: filter 0.5s ease, transform 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        /* EFECTO MISTERIO: Desenfocado por defecto */
+        .msg.misterio {
+            filter: blur(8px);
+            user-select: none;
+        }
+
+        /* REVELADO: Se ve claro al tocar/clic */
+        .msg.misterio.revelado {
+            filter: blur(0);
+            transform: scale(1.02);
+        }
+
+        .mine { align-self: flex-end; background: var(--msg-mine); color: #fff; border-bottom-right-radius: 4px; }
+        .other { align-self: flex-start; background: var(--msg-other); border: 1px solid var(--item-border); color: var(--text); border-bottom-left-radius: 4px; }
+
+        /* HEADER & LAYOUT */
+        #main-app { height: 100vh; display: flex; flex-direction: column; }
+        header { padding: 40px 20px 15px; background: var(--bg); }
+        .header-top { display: flex; justify-content: space-between; align-items: center; }
+        h1 { font-size: 28px; font-weight: 700; letter-spacing: -1px; margin: 0; }
         
-        /* LOGIN STYLE */
-        #login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; }
-        .btn-verify { background: var(--accent); color: white; border: none; padding: 15px; border-radius: 15px; width: 100%; max-width: 280px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        #view-chat { 
+            position: fixed; inset: 0; background: var(--bg); 
+            z-index: 500; display: flex; flex-direction: column;
+            transform: translateX(100%); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #view-chat.active { transform: translateX(0); }
 
-        /* APP HEADER */
-        header { padding: 50px 20px 10px; }
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .logo-main { width: 45px; height: 45px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        h1 { font-size: 32px; margin: 0; font-weight: 800; }
-        
-        .search-container { position: relative; margin-bottom: 25px; }
-        .search-container i { position: absolute; left: 15px; top: 12px; color: #888; }
-        .search-input { width: 90%; background: var(--search-bg); border: none; padding: 12px 12px 12px 40px; border-radius: 18px; font-size: 16px; outline: none; }
+        #chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; }
 
-        /* CHAT LIST */
-        .chat-list { padding: 0 20px; overflow-y: auto; flex: 1; }
-        .chat-item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid var(--item-border); cursor: pointer; }
-        .avatar { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; }
-        .chat-content { flex: 1; }
-        .chat-content h3 { margin: 0; font-size: 17px; font-weight: 600; }
-        .chat-content p { margin: 4px 0 0; font-size: 14px; color: #888; }
-        .chat-meta { text-align: right; font-size: 12px; color: #bbb; }
+        footer { 
+            padding: 15px 20px 35px; background: var(--bg); 
+            display: flex; gap: 10px; align-items: center; border-top: 1px solid var(--item-border);
+        }
+        footer input { 
+            flex: 1; border: none; background: var(--search-bg); 
+            padding: 12px 18px; border-radius: 25px; outline: none; 
+            font-size: 14px; color: var(--text);
+        }
 
-        /* NAVIGATION BAR */
-        nav { background: white; padding: 15px 0 35px; display: flex; justify-content: space-around; border-top: 1px solid var(--item-border); position: fixed; bottom: 0; width: 100%; }
-        [data-theme="dark"] nav { background: #1a1a1a; }
-        nav div { text-align: center; color: var(--tab-inactive); font-size: 11px; cursor: pointer; }
-        nav div.active { color: var(--accent); }
-        nav i { font-size: 22px; display: block; margin-bottom: 4px; }
+        .btn-send { 
+            background: var(--accent); color: white; width: 42px; height: 42px; 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;
+        }
 
-        /* VIEW CHAT */
-        #view-chat { position: fixed; top: 0; right: -100%; width: 100%; height: 100vh; background: var(--bg); z-index: 500; transition: 0.4s; display: flex; flex-direction: column; }
-        #view-chat.active { right: 0; }
+        .hint { font-size: 10px; text-align: center; color: #aaa; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<div id="login-screen">
-    <img src="Logo.jpeg" style="width: 80px; border-radius: 20px; margin-bottom: 20px;">
-    <h2>Verifica tu número</h2>
-    <input type="text" id="phone" style="width: 250px; padding: 15px; border-radius: 12px; border: 1px solid #ddd;" placeholder="+595 9xx xxx xxx">
-    <div id="recaptcha-container" style="margin-top: 10px;"></div>
-    <button class="btn-verify" onclick="sendOTP()">Continuar</button>
-</div>
-
-<div id="main-app" style="display:none; height: 100vh; display: flex; flex-direction: column;">
+<div id="main-app">
     <header>
         <div class="header-top">
-            <img src="Logo.jpeg" class="logo-main">
-            <div onclick="document.body.toggleAttribute('data-theme')" style="font-size: 20px; cursor:pointer">
-                <i class="fa-solid fa-moon"></i>
-            </div>
+            <img src="Logo.jpeg" style="width:40px; border-radius:12px;">
+            <i class="fa-solid fa-moon" onclick="document.body.toggleAttribute('data-theme')" style="cursor:pointer"></i>
         </div>
         <h1>Chats</h1>
-        <div class="search-container">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" class="search-input" placeholder="Search">
-        </div>
     </header>
 
-    <div class="chat-list">
-        <div class="chat-item" onclick="openChat('Leidyd')">
-            <img src="https://i.pravatar.cc/150?u=leidyd" class="avatar">
-            <div class="chat-content">
-                <h3>Leidyd</h3>
-                <p>Hey, message, you'res had...</p>
+    <div style="padding: 20px;">
+        <div class="chat-item" onclick="openChat()" style="display:flex; align-items:center; gap:15px; cursor:pointer;">
+            <img src="Logo.jpeg" style="width:55px; height:55px; border-radius:50%; object-fit:cover;">
+            <div>
+                <h3 style="margin:0; font-size:16px;">BUTTERFLY Group ✨</h3>
+                <p style="margin:0; font-size:13px; color:#888;">Toca para ver los mensajes ocultos...</p>
             </div>
-            <div class="chat-meta">7:06 PM</div>
-        </div>
-        <div class="chat-item" onclick="openChat('Sirvina')">
-            <img src="https://i.pravatar.cc/150?u=sirvina" class="avatar">
-            <div class="chat-content">
-                <h3>Sirvina</h3>
-                <p>Message all mand message...</p>
-            </div>
-            <div class="chat-meta">2:08 PM</div>
         </div>
     </div>
+</div>
 
-    <nav>
-        <div class="active"><i class="fa-solid fa-comment"></i>Chats</div>
-        <div><i class="fa-solid fa-address-book"></i>Contacts</div>
-        <div><i class="fa-solid fa-gear"></i>Settings</div>
-    </nav>
+<div id="view-chat">
+    <div style="padding: 45px 20px 15px; display:flex; align-items:center; gap:15px; border-bottom: 1px solid var(--item-border);">
+        <i class="fa-solid fa-arrow-left" onclick="closeChat()"></i>
+        <img src="Logo.jpeg" style="width:35px; height:35px; border-radius:10px;">
+        <h3 style="margin:0; font-size:16px;">BUTTERFLY Group</h3>
+    </div>
+    
+    <div id="chat-box">
+        <div class="hint">Toca los mensajes borrosos para revelarlos ✨</div>
+    </div>
+
+    <footer>
+        <input type="text" id="msgInput" placeholder="Escribe un mensaje discreto..." autocomplete="off">
+        <div class="btn-send" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></div>
+    </footer>
 </div>
 
 <script type="module">
-    // Aquí va tu lógica de Firebase que ya tienes del paso anterior
-    // Recuerda que 'main-app' se muestra solo después de verificar el teléfono.
-    window.openChat = (name) => alert("Abriendo chat con " + name);
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCpbEqoc9-lgVna4c8SsdUimZLQGjSN3gE",
+        authDomain: "butterfly-2f1ba.firebaseapp.com",
+        projectId: "butterfly-2f1ba",
+        storageBucket: "butterfly-2f1ba.firebasestorage.app",
+        messagingSenderId: "668042697742",
+        appId: "1:668042697742:web:655b9d4ba13088d58ef05f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const messagesCol = collection(db, "messages");
+
+    window.openChat = () => document.getElementById('view-chat').classList.add('active');
+    window.closeChat = () => document.getElementById('view-chat').classList.remove('active');
+
+    let miUsuario = "Leidyd"; // Aquí luego usaremos el número verificado
+
+    window.sendMessage = async () => {
+        const input = document.getElementById('msgInput');
+        if(input.value.trim()){
+            await addDoc(messagesCol, { 
+                text: input.value, 
+                user: miUsuario, 
+                createdAt: serverTimestamp(),
+                misterio: true // Todos los mensajes nuevos nacen con misterio
+            });
+            input.value = "";
+        }
+    };
+
+    onSnapshot(query(messagesCol, orderBy("createdAt", "asc")), (snapshot) => {
+        const box = document.getElementById('chat-box');
+        box.innerHTML = '<div class="hint">Toca los mensajes borrosos para revelarlos ✨</div>';
+        snapshot.forEach(doc => {
+            const msg = doc.data();
+            const isMine = msg.user === miUsuario;
+            const div = document.createElement('div');
+            
+            // Clase de misterio
+            div.className = `msg ${isMine ? 'mine' : 'other'} ${msg.misterio ? 'misterio' : ''}`;
+            div.innerText = msg.text;
+            
+            // Evento para revelar
+            div.onclick = () => div.classList.toggle('revelado');
+            
+            box.appendChild(div);
+        });
+        box.scrollTop = box.scrollHeight;
+    });
 </script>
 </body>
 </html>
