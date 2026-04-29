@@ -4,176 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BUTTERFLY</title>
-    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#fdfaf7">
     <link rel="apple-touch-icon" href="Logo.jpeg">
     <link rel="icon" href="Logo.jpeg">
-
     <style>
-        /* Estética Minimalista y Sofisticada (Quiet Luxury) */
-        body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background-color: #fdfaf7; 
-            margin: 0; 
-            display: flex; 
-            flex-direction: column; 
-            height: 100vh; 
-            color: #4a4a4a; 
-        }
-        
-        header { 
-            background: #fff; 
-            padding: 12px; 
-            border-bottom: 1px solid #f0e9e2; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 10px; 
-            position: sticky; 
-            top: 0; 
-            z-index: 100; 
-        }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #fdfaf7; margin: 0; display: flex; flex-direction: column; height: 100vh; color: #4a4a4a; }
+        header { background: #fff; padding: 12px; border-bottom: 1px solid #f0e9e2; display: flex; align-items: center; justify-content: center; gap: 10px; position: sticky; top: 0; z-index: 100; }
         header img { width: 32px; height: 32px; border-radius: 6px; object-fit: cover; }
-        header h1 { 
-            font-size: 0.75rem; 
-            letter-spacing: 6px; 
-            font-weight: 300; 
-            margin: 0; 
-            color: #2c2c2c; 
-            text-transform: uppercase; 
-        }
-
-        #chat-box { 
-            flex: 1; 
-            padding: 20px; 
-            overflow-y: auto; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-        }
-        
-        .message { 
-            padding: 10px 14px; 
-            border-radius: 15px; 
-            max-width: 75%; 
-            font-size: 0.8rem; 
-            line-height: 1.4;
-            letter-spacing: 0.2px;
-        }
-        
-        .user-name { 
-            font-size: 0.6rem; 
-            font-weight: 600; 
-            margin-bottom: 3px; 
-            display: block; 
-            text-transform: lowercase;
-            color: #9b8a78; 
-        }
-        
-        .other { 
-            align-self: flex-start; 
-            background: #fff; 
-            border: 1px solid #f0e9e2; 
-            color: #4a4a4a; 
-            border-bottom-left-radius: 2px; 
-        }
-        
-        .mine { 
-            align-self: flex-end; 
-            background: #2c2c2c; 
-            color: #fdfaf7; 
-            border-bottom-right-radius: 2px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
+        header h1 { font-size: 0.75rem; letter-spacing: 6px; font-weight: 300; margin: 0; color: #2c2c2c; text-transform: uppercase; }
+        #chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .message { padding: 10px 14px; border-radius: 15px; max-width: 75%; font-size: 0.8rem; line-height: 1.4; }
+        .user-name { font-size: 0.6rem; font-weight: 600; margin-bottom: 3px; display: block; text-transform: lowercase; color: #9b8a78; }
+        .other { align-self: flex-start; background: #fff; border: 1px solid #f0e9e2; border-bottom-left-radius: 2px; }
+        .mine { align-self: flex-end; background: #2c2c2c; color: #fdfaf7; border-bottom-right-radius: 2px; }
         .mine .user-name { color: #c5b4a2; }
-
-        footer { 
-            padding: 15px 20px; 
-            background: #fff; 
-            border-top: 1px solid #f0e9e2; 
-            display: flex; 
-            gap: 12px; 
-            align-items: center; 
-        }
-        
-        input { 
-            flex: 1; 
-            border: 1px solid #f0e9e2; 
-            padding: 10px 18px; 
-            border-radius: 20px; 
-            outline: none; 
-            background: #faf8f6; 
-            font-size: 0.8rem;
-            color: #4a4a4a;
-        }
-        
-        button { 
-            background: none; 
-            color: #2c2c2c; 
-            border: none; 
-            padding: 5px 10px; 
-            cursor: pointer; 
-            font-weight: 600; 
-            font-size: 0.65rem; 
-            letter-spacing: 2px; 
-            text-transform: uppercase;
-        }
+        footer { padding: 15px 20px; background: #fff; border-top: 1px solid #f0e9e2; display: flex; gap: 12px; }
+        input { flex: 1; border: 1px solid #f0e9e2; padding: 10px 18px; border-radius: 20px; outline: none; background: #faf8f6; font-size: 0.8rem; }
+        button { background: none; color: #2c2c2c; border: none; padding: 5px 10px; cursor: pointer; font-weight: 600; font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; }
     </style>
 </head>
 <body>
-
-<header>
-    <img src="Logo.jpeg" alt="Logo">
-    <h1>BUTTERFLY</h1>
-</header>
-
+<header><img src="Logo.jpeg" alt="Logo"><h1>BUTTERFLY</h1></header>
 <div id="chat-box"></div>
-
-<footer>
-    <input type="text" id="msgInput" placeholder="escribe aquí..." autocomplete="off">
-    <button id="sendBtn">Enviar</button>
-</footer>
-
+<footer><input type="text" id="msgInput" placeholder="escribe aquí..."><button id="sendBtn">Enviar</button></footer>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCpbEqoc9-lgVna4c8SsdUimZLQGjSN3gE",
-    authDomain: "butterfly-2f1ba.firebaseapp.com",
-    projectId: "butterfly-2f1ba",
-    storageBucket: "butterfly-2f1ba.firebasestorage.app",
-    messagingSenderId: "668042697742",
-    appId: "1:668042697742:web:655b9d4ba13088d58ef05f",
-    measurementId: "G-NCW8JDWE5V"
-  };
-
+  const firebaseConfig = { apiKey: "AIzaSyCpbEqoc9-lgVna4c8SsdUimZLQGjSN3gE", authDomain: "butterfly-2f1ba.firebaseapp.com", projectId: "butterfly-2f1ba", storageBucket: "butterfly-2f1ba.firebasestorage.app", messagingSenderId: "668042697742", appId: "1:668042697742:web:655b9d4ba13088d58ef05f" };
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const messagesCol = collection(db, "messages");
-
   let usuario = localStorage.getItem('chat_user') || prompt("Dime tu nombre:") || "usuario";
   localStorage.setItem('chat_user', usuario);
-
   const sendAction = async () => {
       const input = document.getElementById('msgInput');
       if(input.value.trim() !== "") {
-          const text = input.value;
-          input.value = "";
+          const text = input.value; input.value = "";
           await addDoc(messagesCol, { text, user: usuario, createdAt: serverTimestamp() });
       }
   };
-
   document.getElementById('sendBtn').onclick = sendAction;
   document.getElementById('msgInput').onkeypress = (e) => { if(e.key === 'Enter') sendAction(); };
-
   onSnapshot(query(messagesCol, orderBy("createdAt", "asc")), (snapshot) => {
-      const box = document.getElementById('chat-box');
-      box.innerHTML = "";
+      const box = document.getElementById('chat-box'); box.innerHTML = "";
       snapshot.forEach((doc) => {
-          const msg = doc.data();
-          if(!msg.text) return;
+          const msg = doc.data(); if(!msg.text) return;
           const isMine = msg.user === usuario;
           const div = document.createElement('div');
           div.className = `message ${isMine ? 'mine' : 'other'}`;
@@ -182,14 +58,7 @@
       });
       box.scrollTop = box.scrollHeight;
   });
-
-  // REGISTRO DEL SERVICE WORKER (Para activar el botón de instalar)
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js').catch(err => console.log(err));
-    });
-  }
+  if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js'); }); }
 </script>
-
 </body>
 </html>
