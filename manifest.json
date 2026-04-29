@@ -1,0 +1,20 @@
+{
+  "short_name": "BUTTERFLY",
+  "name": "BUTTERFLY Chat",
+  "icons": [
+    {
+      "src": "Logo.jpeg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "Logo.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#fdfaf7",
+  "background_color": "#fdfaf7"
+}
