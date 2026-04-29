@@ -1,5 +1,5 @@
 {
-  "name": "BUTTERFLY Luxury Chat",
+  "name": "BUTTERFLY",
   "short_name": "BUTTERFLY",
   "start_url": "index.html",
   "display": "standalone",
@@ -8,13 +8,9 @@
   "icons": [
     {
       "src": "Logo.jpeg",
-      "sizes": "192x192",
-      "type": "image/jpeg"
-    },
-    {
-      "src": "Logo.jpeg",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/jpeg",
+      "purpose": "any maskable"
     }
   ]
 }
