@@ -4,11 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BUTTERFLY</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#fdfaf7">
+    <link rel="apple-touch-icon" href="Logo.jpeg">
+    <link rel="icon" href="Logo.jpeg">
+
     <style>
         /* Estética Minimalista y Sofisticada */
         body { 
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background-color: #fdfaf7; /* Tono crema muy suave */
+            background-color: #fdfaf7; /* Tono crema suave */
             margin: 0; 
             display: flex; 
             flex-direction: column; 
@@ -28,7 +34,7 @@
             top: 0; 
             z-index: 100; 
         }
-        header img { width: 32px; height: 32px; border-radius: 6px; }
+        header img { width: 32px; height: 32px; border-radius: 6px; object-fit: cover; }
         header h1 { 
             font-size: 0.75rem; 
             letter-spacing: 6px; 
@@ -50,10 +56,11 @@
         .message { 
             padding: 10px 14px; 
             border-radius: 15px; 
-            max-width: 70%; 
+            max-width: 75%; 
             font-size: 0.8rem; /* Fuente pequeña y discreta */
             line-height: 1.4;
             letter-spacing: 0.2px;
+            position: relative;
         }
         
         .user-name { 
@@ -62,7 +69,7 @@
             margin-bottom: 3px; 
             display: block; 
             text-transform: lowercase;
-            color: #9b8a78; /* Tono arena para nombres */
+            color: #9b8a78; /* Tono arena */
         }
         
         .other { 
@@ -75,7 +82,7 @@
         
         .mine { 
             align-self: flex-end; 
-            background: #2c2c2c; /* Negro suave para tus mensajes */
+            background: #2c2c2c; /* Negro elegante */
             color: #fdfaf7; 
             border-bottom-right-radius: 2px; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -133,6 +140,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+  // Tu configuración de Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyCpbEqoc9-lgVna4c8SsdUimZLQGjSN3gE",
     authDomain: "butterfly-2f1ba.firebaseapp.com",
@@ -147,21 +155,32 @@
   const db = getFirestore(app);
   const messagesCol = collection(db, "messages");
 
+  // Manejo de usuario
   let usuario = localStorage.getItem('chat_user') || prompt("Dime tu nombre:") || "usuario";
   localStorage.setItem('chat_user', usuario);
 
+  // Función para enviar mensajes
   const sendAction = async () => {
       const input = document.getElementById('msgInput');
       if(input.value.trim() !== "") {
           const text = input.value;
           input.value = "";
-          await addDoc(messagesCol, { text, user: usuario, createdAt: serverTimestamp() });
+          try {
+              await addDoc(messagesCol, { 
+                  text, 
+                  user: usuario, 
+                  createdAt: serverTimestamp() 
+              });
+          } catch (e) {
+              console.error("Error al enviar:", e);
+          }
       }
   };
 
   document.getElementById('sendBtn').onclick = sendAction;
   document.getElementById('msgInput').onkeypress = (e) => { if(e.key === 'Enter') sendAction(); };
 
+  // Escuchar mensajes en tiempo real
   onSnapshot(query(messagesCol, orderBy("createdAt", "asc")), (snapshot) => {
       const box = document.getElementById('chat-box');
       box.innerHTML = "";
