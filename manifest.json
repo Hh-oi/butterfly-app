@@ -1,10 +1,9 @@
 {
   "name": "BUTTERFLY Digital Luxury",
   "short_name": "BUTTERFLY",
-  "description": "Mensajería privada y estética con efecto seda.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#fdfaf7",
+  "background_color": "#1c1c1c",
   "theme_color": "#9b8a78",
   "orientation": "portrait",
   "icons": [
