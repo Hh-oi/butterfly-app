@@ -1,4 +1,4 @@
-const CACHE_NAME = 'butterfly-v2';
+const CACHE_NAME = 'butterfly-v3';
 const assets = [
   './',
   './index.html',
@@ -9,12 +9,10 @@ const assets = [
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(assets))
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(assets);
+    })
   );
-});
-
-self.addEventListener('activate', event => {
-  event.waitUntil(clients.claim());
 });
 
 self.addEventListener('fetch', event => {
