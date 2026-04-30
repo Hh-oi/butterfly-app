@@ -60,11 +60,8 @@
 
     window.processLogin = async () => {
         const btn = document.getElementById('btn-action');
-        
         if (step === 1) {
             const phoneNumber = iti.getNumber();
-            
-            // Usamos tu ID de la foto directamente aquí
             window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
                 'size': 'normal',
                 'sitekey': '6LfWMNEsAAAAAD3Z21QA_y1GQE7hsLJiTk6pLIfN'
@@ -73,32 +70,26 @@
             try {
                 btn.innerText = "Enviando...";
                 window.confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
-                
                 document.getElementById('otp-input').style.display = 'block';
                 btn.innerText = "Verificar Código";
                 step = 2;
             } catch (error) {
                 alert("Error: " + error.message);
                 btn.innerText = "Continuar";
-                if(window.recaptchaVerifier) window.recaptchaVerifier.render().then(id => grecaptcha.reset(id));
             }
         } else {
             const code = document.getElementById('otp-input').value;
             window.confirmationResult.confirm(code).then(() => {
                 alert("¡Bienvenida, Leidyd!");
-                // Aquí podrías poner: window.location.href = "chat.html";
-            }).catch(() => alert("Código incorrecto, intenta de nuevo."));
+            }).catch(() => alert("Código incorrecto"));
         }
     };
-</script>
 
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js');
-    });
-  }
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.worker = navigator.serviceWorker.register('./sw.js');
+      });
+    }
 </script>
-
 </body>
 </html>
