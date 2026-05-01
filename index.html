@@ -3,52 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BUTTERFLY | Acceso</title>
-    <link rel="manifest" href="manifest.json">
+    <title>BUTTERFLY | Chat</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
     <style>
         :root { --bg: #121212; --accent: #9b8a78; --card: #1e1e1e; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; color: white; }
-        .login-card { background: var(--card); padding: 40px 30px; border-radius: 30px; text-align: center; width: 85%; max-width: 350px; box-shadow: 0 15px 35px rgba(0,0,0,0.7); }
-        .logo { width: 90px; height: 90px; border-radius: 20px; margin-bottom: 20px; object-fit: cover; border: 1.5px solid #333; }
-        h2 { margin: 0; letter-spacing: 3px; font-weight: 400; font-size: 22px; }
-        .subtitle { color: #777; font-size: 12px; margin-bottom: 30px; letter-spacing: 1px; }
-
-        /* ARREGLO PARA QUE NO SE VEA FEO */
+        .login-card { background: var(--card); padding: 40px 30px; border-radius: 30px; text-align: center; width: 85%; max-width: 400px; box-shadow: 0 15px 35px rgba(0,0,0,0.7); }
+        .logo { width: 80px; height: 80px; border-radius: 20px; margin-bottom: 15px; border: 1.5px solid #333; }
         .iti { width: 100%; margin-bottom: 20px; color: black; }
-        #phone { 
-            width: 100%; height: 55px; border-radius: 12px; border: 1px solid #444; 
-            background: #2a2a2a; color: white; font-size: 17px;
-            padding-left: 90px !important; /* Espacio para que el +595 no tape nada */
-        }
+        #phone, #otp-input, #msg-input { width: 100%; height: 50px; border-radius: 12px; border: 1px solid #444; background: #2a2a2a; color: white; font-size: 16px; box-sizing: border-box; }
+        #phone { padding-left: 90px !important; }
+        .btn-primary { background: var(--accent); color: white; border: none; width: 100%; padding: 16px; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 10px; }
         
-        .btn-primary { 
-            background: var(--accent); color: white; border: none; width: 100%; 
-            padding: 16px; border-radius: 12px; font-weight: 600; font-size: 16px; cursor: pointer;
-        }
-        #otp-input { 
-            width: 100%; height: 55px; border-radius: 12px; border: 2px solid var(--accent); 
-            text-align: center; font-size: 24px; margin-top: 15px; display: none; 
-            background: #000; color: white; letter-spacing: 5px; 
-        }
-        #recaptcha-container { margin: 20px 0; display: flex; justify-content: center; transform: scale(0.85); }
+        /* Contenedor de Chat */
+        #chat-container { display: none; flex-direction: column; height: 400px; }
+        #messages { flex-grow: 1; overflow-y: auto; text-align: left; margin-bottom: 15px; padding: 10px; background: #0b0b0b; border-radius: 15px; border: 1px solid #333; }
+        .msg-bubble { margin-bottom: 10px; padding: 8px 12px; border-radius: 10px; background: #262626; font-size: 14px; }
+        .msg-user { color: var(--accent); font-weight: bold; font-size: 11px; display: block; }
     </style>
 </head>
 <body>
+
 <div class="login-card">
-    <img src="Logo.jpeg" class="logo">
-    <h2>BUTTERFLY</h2>
-    <div class="subtitle">DIGITAL LUXURY</div>
-    <input type="tel" id="phone">
-    <div id="recaptcha-container"></div>
-    <button class="btn-primary" id="btn-action" onclick="processLogin()">Continuar</button>
-    <input type="text" id="otp-input" placeholder="000000" maxlength="6">
+    <div id="auth-section">
+        <img src="Logo.jpeg" class="logo">
+        <h2>BUTTERFLY</h2>
+        <div style="color: #777; font-size: 12px; margin-bottom: 25px;">DIGITAL LUXURY</div>
+        
+        <input type="tel" id="phone">
+        <div id="recaptcha-container"></div>
+        <input type="text" id="otp-input" placeholder="Código de 6 dígitos" maxlength="6" style="display:none; text-align:center; letter-spacing:4px; margin-top:10px;">
+        <button class="btn-primary" id="btn-action" onclick="processLogin()">Continuar</button>
+    </div>
+
+    <!-- SECCIÓN DE CHAT -->
+    <div id="chat-container">
+        <div id="messages"></div>
+        <div style="display:flex; gap: 5px;">
+            <input type="text" id="msg-input" placeholder="Escribe un mensaje...">
+            <button onclick="sendMsg()" style="background:var(--accent); border:none; border-radius:10px; padding:0 15px; color:white; cursor:pointer;">↑</button>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCpbEqoc9-lgVna4c8SsdUimZLQGjSN3gE",
@@ -56,13 +58,14 @@
         projectId: "butterfly-2f1ba",
         storageBucket: "butterfly-2f1ba.firebasestorage.app",
         messagingSenderId: "668042697742",
-        appId: "1:668042697742:web:655b9d4ba13088d58ef05f"
+        appId: "1:668042697742:web:4574346fb1e055b28ef05f"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const phoneInput = document.querySelector("#phone");
-    const iti = window.intlTelInput(phoneInput, {
+    const db = getFirestore(app);
+
+    const iti = window.intlTelInput(document.querySelector("#phone"), {
         initialCountry: "py",
         separateDialCode: true,
         utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
@@ -74,28 +77,51 @@
         const btn = document.getElementById('btn-action');
         if (step === 1) {
             const phoneNumber = iti.getNumber();
-            if (!window.recaptchaVerifier) {
-                window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-                    'size': 'normal',
-                    'sitekey': '6LfWMNEsAAAAAD3Z21QA_y1GQE7hsLJiTk6pLIfN'
-                });
-            }
+            window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'invisible' });
             try {
                 btn.innerText = "Enviando...";
                 window.confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
                 document.getElementById('otp-input').style.display = 'block';
+                document.getElementById('phone').style.display = 'none';
                 btn.innerText = "Verificar Código";
                 step = 2;
             } catch (e) { alert("Error: " + e.message); btn.innerText = "Continuar"; }
         } else {
             const code = document.getElementById('otp-input').value;
-            window.confirmationResult.confirm(code).then(() => { alert("¡Acceso Concedido!"); })
-            .catch(() => alert("Código incorrecto"));
+            window.confirmationResult.confirm(code).then(() => {
+                document.getElementById('auth-section').style.display = 'none';
+                document.getElementById('chat-container').style.display = 'flex';
+                loadMessages();
+            }).catch(() => alert("Código incorrecto"));
         }
     };
 
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); });
+    window.sendMsg = async () => {
+        const input = document.getElementById('msg-input');
+        if (!input.value.trim()) return;
+        await addDoc(collection(db, "chats"), {
+            text: input.value,
+            user: auth.currentUser.phoneNumber,
+            timestamp: serverTimestamp()
+        });
+        input.value = "";
+    };
+
+    function loadMessages() {
+        const q = query(collection(db, "chats"), orderBy("timestamp", "asc"));
+        onSnapshot(q, (snapshot) => {
+            const msgDiv = document.getElementById('messages');
+            msgDiv.innerHTML = "";
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                msgDiv.innerHTML += `
+                    <div class="msg-bubble">
+                        <span class="msg-user">${data.user}</span>
+                        ${data.text}
+                    </div>`;
+            });
+            msgDiv.scrollTop = msgDiv.scrollHeight;
+        });
     }
 </script>
 </body>
