@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BUTTERFLY</title>
     
+    <!-- CONFIGURACIÓN PWA PARA INSTALACIÓN -->
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="Logo.jpeg">
     <meta name="mobile-web-app-capable" content="yes">
@@ -12,39 +13,97 @@
     <meta name="theme-color" content="#00a884">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
+    
     <style>
-        :root { --wa-bg: #0b141a; --wa-header: #202c33; --wa-teal: #00a884; --wa-text: #e9edef; --wa-msg-my: #005c4b; --wa-msg-other: #233138; --wa-gray: #8696a0; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--wa-bg); margin: 0; color: var(--wa-text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        :root { 
+            --wa-bg: #0b141a; 
+            --wa-header: #202c33; 
+            --wa-teal: #00a884; 
+            --wa-text: #e9edef; 
+            --wa-msg-my: #005c4b; 
+            --wa-msg-other: #233138; 
+            --wa-gray: #8696a0; 
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--wa-bg); 
+            margin: 0; 
+            color: var(--wa-text); 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+        }
+
+        /* DISEÑO DE LOGIN REFINADO */
+        #login-overlay { 
+            position: fixed; 
+            inset: 0; 
+            background: var(--wa-bg); 
+            z-index: 1000; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            text-align: center; 
+        }
+
+        .login-card {
+            width: 90%;
+            max-width: 340px;
+            padding: 20px;
+        }
+
+        .btn-teal { 
+            background: var(--wa-teal); 
+            color: white; 
+            border: none; 
+            padding: 14px; 
+            border-radius: 25px; 
+            font-weight: bold; 
+            width: 100%; 
+            cursor: pointer; 
+            font-size: 16px;
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(0, 168, 132, 0.2);
+        }
+
+        #phone-field { width: 100%; margin-bottom: 10px; }
+
+        /* INTERFAZ PRINCIPAL */
         .app-bar { background: var(--wa-header); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #222d34; z-index: 100; }
         .logo-img { width: 35px; height: 35px; border-radius: 8px; object-fit: cover; }
         .brand-name { font-size: 20px; font-weight: 700; color: var(--wa-teal); }
+        
         #chat-list { flex: 1; overflow-y: auto; }
         .contact-card { display: flex; align-items: center; padding: 12px 16px; gap: 15px; border-bottom: 0.5px solid #222d34; cursor: pointer; }
-        .pfp-circle { width: 48px; height: 48px; border-radius: 50%; background: #3b4a54; overflow: hidden; }
-        .pfp-circle img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* PANTALLA DE CHAT */
         #chat-screen { display: none; position: fixed; inset: 0; background: #0b141a url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); z-index: 200; flex-direction: column; }
         .msg-box { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 4px; }
-        .bubble { max-width: 85%; padding: 6px 12px; border-radius: 8px; font-size: 14.5px; }
+        .bubble { max-width: 85%; padding: 8px 12px; border-radius: 10px; font-size: 15px; line-height: 1.4; }
         .my { align-self: flex-end; background: var(--wa-msg-my); border-top-right-radius: 0; }
         .other { align-self: flex-start; background: var(--wa-msg-other); border-top-left-radius: 0; }
-        .input-bar { background: var(--wa-header); padding: 8px 12px; display: flex; align-items: center; gap: 8px; }
-        #msg-input { flex: 1; background: #2a3942; border: none; padding: 10px 16px; border-radius: 20px; color: white; outline: none; }
-        #modal-container { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 500; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-box { background: #233138; width: 85%; max-width: 320px; padding: 20px; border-radius: 20px; text-align: center; }
-        .btn-teal { background: var(--wa-teal); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; }
-        .fab { position: fixed; bottom: 25px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--wa-teal); color: white; border: none; font-size: 24px; z-index: 50; }
-        #login-overlay { position: fixed; inset: 0; background: var(--wa-bg); z-index: 1000; display: flex; align-items: center; justify-content: center; text-align: center; }
+
+        .input-bar { background: var(--wa-header); padding: 10px; display: flex; align-items: center; gap: 10px; }
+        #msg-input { flex: 1; background: #2a3942; border: none; padding: 12px 18px; border-radius: 25px; color: white; outline: none; }
+
+        .fab { position: fixed; bottom: 25px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--wa-teal); color: white; border: none; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 50; }
     </style>
 </head>
 <body>
 
 <div id="login-overlay">
-    <div style="width: 85%;">
-        <img src="Logo.jpeg" style="width:100px; border-radius:20px; margin-bottom:20px;">
-        <h1 style="color:var(--wa-teal);">BUTTERFLY</h1>
-        <input type="tel" id="phone-field">
+    <div class="login-card">
+        <img src="Logo.jpeg" style="width:110px; height:110px; border-radius:25px; margin-bottom:20px; object-fit:cover;">
+        <h1 style="color:white; margin:0; letter-spacing: 2px;">BUTTERFLY</h1>
+        <p style="color:var(--wa-gray); margin-bottom:25px; font-size:14px;">Mensajería Privada</p>
+        
+        <div style="margin-bottom:15px;"><input type="tel" id="phone-field"></div>
         <div id="recaptcha-container"></div>
-        <input type="text" id="otp-field" placeholder="Código SMS" style="display:none; width:100%; padding:15px; margin: 20px 0; background:#2a3942; border:none; color:white; border-radius:10px; text-align:center;">
+        
+        <input type="text" id="otp-field" placeholder="Código SMS" style="display:none; width:100%; padding:14px; margin: 15px 0; background:#2a3942; border:none; color:white; border-radius:25px; text-align:center; box-sizing: border-box;">
+        
         <button id="login-btn" class="btn-teal">INGRESAR</button>
     </div>
 </div>
@@ -54,7 +113,7 @@
         <img src="Logo.jpeg" class="logo-img">
         <span class="brand-name">Butterfly</span>
     </div>
-    <div id="dots-btn" style="color:var(--wa-gray); cursor:pointer;">⋮</div>
+    <div id="dots-btn" style="color:var(--wa-gray); cursor:pointer; font-size:20px;">⋮</div>
 </div>
 
 <div id="chat-list"></div>
@@ -63,30 +122,20 @@
 <div id="chat-screen">
     <div class="app-bar">
         <span id="back-btn" style="cursor:pointer; font-size:26px;">←</span>
-        <div class="pfp-circle" style="width:34px; height:34px; margin-left:10px;"><img src="Logo.jpeg"></div>
-        <div id="chat-user-name" style="flex:1; margin-left:10px; font-weight:500;">Usuario</div>
+        <div style="flex:1; margin-left:15px; font-weight:500;" id="chat-user-name">Chat</div>
     </div>
     <div class="msg-box" id="msg-box"></div>
     <div class="input-bar">
-        <input type="text" id="msg-input" placeholder="Mensaje" autocomplete="off">
+        <input type="text" id="msg-input" placeholder="Escribe un mensaje..." autocomplete="off">
         <button id="send-btn" style="background:none; border:none; color:var(--wa-teal); font-size:28px;">➤</button>
-    </div>
-</div>
-
-<div id="modal-container">
-    <div class="modal-box">
-        <h3>Nuevo Chat</h3>
-        <input type="tel" id="new-contact-num" style="width:100%; padding:12px; margin-bottom:15px; background:#2a3942; border:none; color:white; border-radius:10px;" placeholder="+595...">
-        <button id="modal-add" class="btn-teal">AGREGAR</button>
-        <p id="modal-close" style="color:var(--wa-gray); margin-top:15px; cursor:pointer;">Cancelar</p>
     </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 <script type="module">
-    // 1. REGISTRO DEL MOTOR DE INSTALACIÓN
+    // MOTOR DE INSTALACIÓN
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').then(() => console.log("Motor Activo"));
+        navigator.serviceWorker.register('./sw.js').then(() => console.log("SW Activo"));
     }
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -126,16 +175,6 @@
         }
     };
 
-    document.getElementById('fab-add').onclick = () => document.getElementById('modal-container').style.display = 'flex';
-    document.getElementById('modal-close').onclick = () => document.getElementById('modal-container').style.display = 'none';
-    document.getElementById('modal-add').onclick = async () => {
-        const n = document.getElementById('new-contact-num').value;
-        if(n) {
-            await addDoc(collection(db, "contacts"), { owner: auth.currentUser.phoneNumber, name: n, phone: n });
-            document.getElementById('modal-container').style.display = 'none';
-        }
-    };
-
     function sync() {
         onSnapshot(query(collection(db, "contacts"), where("owner", "==", auth.currentUser.phoneNumber)), (s) => {
             const l = document.getElementById('chat-list');
@@ -143,8 +182,8 @@
             s.forEach(doc => {
                 const c = doc.data();
                 l.innerHTML += `<div class="contact-card" onclick="openChat('${c.phone}')">
-                    <div class="pfp-circle"><img src="Logo.jpeg"></div>
-                    <div><h4>${c.name}</h4><p style="font-size:12px; color:var(--wa-gray);">Toca para chatear</p></div>
+                    <div style="width:48px; height:48px; border-radius:50%; background:#3b4a54; overflow:hidden;"><img src="Logo.jpeg" style="width:100%; height:100%; object-fit:cover;"></div>
+                    <div><h4 style="margin:0;">${c.name}</h4><p style="margin:0; font-size:12px; color:var(--wa-gray);">Toca para chatear</p></div>
                 </div>`;
             });
         });
