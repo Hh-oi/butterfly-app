@@ -3,83 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BUTTERFLY | WhatsApp Style</title>
+    <title>BUTTERFLY | WhatsApp</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
     <style>
         :root { --wa-bg: #0b141a; --wa-header: #202c33; --wa-accent: #9b8a78; --wa-text: #e9edef; --wa-my-msg: #005c4b; --wa-other-msg: #202c33; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--wa-bg); margin: 0; color: var(--wa-text); height: 100vh; overflow: hidden; }
         
-        /* Pantalla de Login */
+        /* Login */
         #auth-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; text-align: center; }
-        .login-card { background: #111b21; padding: 40px; border-radius: 20px; width: 100%; max-width: 350px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .login-card { background: #111b21; padding: 30px; border-radius: 20px; width: 100%; max-width: 320px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
         
-        /* Pantalla de Contactos (Lista) */
+        /* Pantalla de Contactos */
         #contacts-screen { display: none; flex-direction: column; height: 100vh; }
-        .header { background: var(--wa-header); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header { background: var(--wa-header); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        #contacts-list { flex-grow: 1; overflow-y: auto; }
         .contact-item { padding: 15px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 0.5px solid #222d34; cursor: pointer; }
-        .contact-item:active { background: #202c33; }
-        .avatar { width: 50px; height: 50px; border-radius: 50%; background: #6a7175; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; background: #6a7175; display: flex; align-items: center; justify-content: center; font-weight: bold; }
         
         /* Pantalla de Chat */
-        #chat-screen { display: none; flex-direction: column; height: 100vh; background: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-color: #0b141a; }
-        #messages-list { flex-grow: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        
-        .msg { max-width: 75%; padding: 8px 12px; border-radius: 8px; font-size: 15px; position: relative; }
-        .my { align-self: flex-end; background: var(--wa-my-msg); border-top-right-radius: 0; }
-        .other { align-self: flex-start; background: var(--wa-other-msg); border-top-left-radius: 0; }
+        #chat-screen { display: none; flex-direction: column; height: 100vh; background-color: #0b141a; }
+        #messages-list { flex-grow: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+        .msg { max-width: 80%; padding: 8px 12px; border-radius: 8px; font-size: 15px; }
+        .my { align-self: flex-end; background: var(--wa-my-msg); }
+        .other { align-self: flex-start; background: var(--wa-other-msg); }
         
         .input-bar { background: #202c33; padding: 10px; display: flex; align-items: center; gap: 10px; }
         #msg-input { flex-grow: 1; background: #2a3942; border: none; border-radius: 20px; padding: 10px 15px; color: white; outline: none; }
-        
-        .btn-add { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--wa-accent); border: none; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .btn-add { position: fixed; bottom: 30px; right: 20px; width: 55px; height: 55px; border-radius: 50%; background: var(--wa-accent); border: none; color: white; font-size: 24px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<!-- 1. LOGIN -->
 <div id="auth-screen">
     <div class="login-card">
-        <img src="Logo.jpeg" style="width:80px; border-radius:20px; margin-bottom:15px;">
-        <h2>BUTTERFLY</h2>
-        <input type="tel" id="phone" style="width:100%; padding:10px; margin-bottom:10px; background:#2a3942; border:none; color:white; border-radius:5px;">
+        <img src="Logo.jpeg" style="width:70px; border-radius:15px; margin-bottom:10px;">
+        <h3>BUTTERFLY</h3>
+        <input type="tel" id="phone" style="width:100%; margin-bottom:10px;">
         <div id="recaptcha-container"></div>
-        <input type="text" id="otp-input" placeholder="Código SMS" style="display:none; width:100%; padding:10px; margin-bottom:10px; background:#2a3942; border:none; color:white; border-radius:5px; text-align:center;">
-        <button id="btn-login" style="width:100%; padding:12px; background:var(--wa-accent); border:none; color:white; font-weight:bold; border-radius:5px; cursor:pointer;">COMENZAR</button>
+        <input type="text" id="otp-input" placeholder="Código SMS" style="display:none; width:100%; padding:10px; margin-bottom:10px; background:#2a3942; border:none; color:white; border-radius:5px;">
+        <button id="btn-login" style="width:100%; padding:12px; background:var(--wa-accent); border:none; color:white; font-weight:bold; border-radius:5px;">COMENZAR</button>
     </div>
 </div>
 
-<!-- 2. LISTA DE CONTACTOS -->
 <div id="contacts-screen">
-    <div class="header">
-        <span style="font-size: 20px; font-weight: bold;">WhatsApp Butterfly</span>
-        <span>🔍 ⋮</span>
-    </div>
-    <div id="contacts-list">
-        <!-- Los contactos aparecerán aquí -->
-    </div>
-    <button class="btn-add" onclick="addNewContact()">+</button>
+    <div class="header"><span>Butterfly Luxury</span></div>
+    <div id="contacts-list"></div>
+    <button class="btn-add" id="add-contact-btn">+</button>
 </div>
 
-<!-- 3. CHAT INDIVIDUAL -->
 <div id="chat-screen">
     <div class="header">
         <div style="display:flex; align-items:center; gap:10px;">
-            <span onclick="showContacts()" style="cursor:pointer;">←</span>
-            <div id="chat-avatar" class="avatar" style="width:35px; height:35px; font-size:12px;"></div>
-            <div id="chat-name" style="font-weight:bold;">Nombre</div>
+            <span id="back-to-contacts" style="cursor:pointer; padding: 5px;">←</span>
+            <div id="chat-name">Chat</div>
         </div>
     </div>
     <div id="messages-list"></div>
     <div class="input-bar">
         <input type="text" id="msg-input" placeholder="Escribe un mensaje">
-        <button id="btn-send" style="background:none; border:none; color:var(--wa-accent); font-size:24px;">➤</button>
+        <button id="btn-send" style="background:none; border:none; color:var(--wa-accent); font-size:20px;">➤</button>
     </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -97,40 +86,36 @@
 
     let currentChatId = null;
     let confirmationResult = null;
+    const iti = window.intlTelInput(document.querySelector("#phone"), { initialCountry: "py", separateDialCode: true });
 
-    // Login logic
-    const phoneInput = document.querySelector("#phone");
-    const iti = window.intlTelInput(phoneInput, { initialCountry: "py", separateDialCode: true });
-    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'invisible' });
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('contacts-screen').style.display = 'flex';
+            loadContacts();
+        }
+    });
 
     document.getElementById('btn-login').onclick = async () => {
         const btn = document.getElementById('btn-login');
         if (btn.innerText === "COMENZAR") {
-            confirmationResult = await signInWithPhoneNumber(auth, iti.getNumber(), window.recaptchaVerifier);
+            const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'invisible' });
+            confirmationResult = await signInWithPhoneNumber(auth, iti.getNumber(), verifier);
             document.getElementById('otp-input').style.display = 'block';
-            phoneInput.style.display = 'none';
             btn.innerText = "VERIFICAR";
         } else {
             await confirmationResult.confirm(document.getElementById('otp-input').value);
-            document.getElementById('auth-screen').style.display = 'none';
-            showContacts();
         }
     };
 
-    // Funciones Globales
-    window.showContacts = () => {
-        document.getElementById('contacts-screen').style.display = 'flex';
-        document.getElementById('chat-screen').style.display = 'none';
-        loadContacts();
-    };
-
-    window.addNewContact = async () => {
-        const num = prompt("Ingrese el número de teléfono (con +595):");
+    document.getElementById('add-contact-btn').onclick = async () => {
+        const num = prompt("Número de contacto (Ej: +59598...):");
         if (num) {
             await addDoc(collection(db, "contacts"), {
                 owner: auth.currentUser.phoneNumber,
                 contactNum: num,
-                name: num
+                name: num,
+                createdAt: serverTimestamp()
             });
         }
     };
@@ -144,7 +129,7 @@
                 const data = doc.data();
                 const div = document.createElement('div');
                 div.className = 'contact-item';
-                div.innerHTML = `<div class="avatar">${data.name[0]}</div><div>${data.name}</div>`;
+                div.innerHTML = `<div class="avatar">${data.name.substring(1,3)}</div><div>${data.name}</div>`;
                 div.onclick = () => openChat(data.contactNum);
                 list.appendChild(div);
             });
@@ -156,9 +141,13 @@
         document.getElementById('contacts-screen').style.display = 'none';
         document.getElementById('chat-screen').style.display = 'flex';
         document.getElementById('chat-name').innerText = contactNum;
-        document.getElementById('chat-avatar').innerText = contactNum[1];
         loadMessages();
     }
+
+    document.getElementById('back-to-contacts').onclick = () => {
+        document.getElementById('contacts-screen').style.display = 'flex';
+        document.getElementById('chat-screen').style.display = 'none';
+    };
 
     function loadMessages() {
         const q = query(collection(db, "messages"), where("chatId", "==", currentChatId), orderBy("timestamp", "asc"));
