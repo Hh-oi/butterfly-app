@@ -4,95 +4,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>WhatsApp Butterfly</title>
+    <!-- Configuración para "Descargar" como App -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="Logo.jpeg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
     <style>
-        :root { 
-            --wa-teal-dark: #075e54; --wa-teal-light: #128c7e; 
-            --wa-bg: #0b141a; --wa-header: #202c33; 
-            --wa-text: #e9edef; --wa-msg-my: #005c4b; --wa-msg-other: #202c33;
-        }
-        body { font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--wa-bg); margin: 0; color: var(--wa-text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        
-        /* HEADER PRINCIPAL */
-        .top-nav { background: var(--wa-header); padding: 15px 20px 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .tabs { display: flex; text-align: center; font-weight: bold; color: #8696a0; text-transform: uppercase; font-size: 14px; }
-        .tab { flex: 1; padding: 10px 0; cursor: pointer; border-bottom: 3px solid transparent; }
-        .tab.active { color: var(--wa-teal-light); border-bottom: 3px solid var(--wa-teal-light); }
-
-        /* LISTA DE CHATS */
-        #main-container { flex-grow: 1; overflow-y: auto; }
-        .chat-row { display: flex; align-items: center; padding: 12px 16px; border-bottom: 0.5px solid #222d34; cursor: pointer; transition: 0.2s; }
-        .chat-row:active { background: #202c33; }
-        .profile-pic { width: 50px; height: 50px; border-radius: 50%; background: #6a7175; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; }
-        .chat-info { flex-grow: 1; }
-        .chat-info h4 { margin: 0; font-size: 16px; font-weight: 500; }
-        .chat-info p { margin: 3px 0 0; font-size: 13px; color: #8696a0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-        /* PANTALLA DE CHAT ABIERTO */
-        #chat-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b141a url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); z-index: 100; flex-direction: column; }
-        .chat-header { background: var(--wa-header); padding: 10px 15px; display: flex; align-items: center; gap: 10px; }
-        .msg-area { flex-grow: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
-        .bubble { max-width: 80%; padding: 8px 12px; border-radius: 8px; font-size: 15px; position: relative; }
-        .my { align-self: flex-end; background: var(--wa-msg-my); border-top-right-radius: 0; }
-        .other { align-self: flex-start; background: var(--wa-msg-other); border-top-left-radius: 0; }
-
-        /* BOTONES Y ENTRADAS */
-        .fab { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; border-radius: 50%; background: #00a884; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.4); cursor: pointer; border: none; color: white; font-size: 24px; z-index: 50; }
-        .input-box { background: var(--wa-header); padding: 8px 12px; display: flex; align-items: center; gap: 10px; }
-        #msg-input { flex-grow: 1; background: #2a3942; border: none; border-radius: 20px; padding: 10px 15px; color: white; outline: none; }
-        
-        /* LOGIN MODAL */
-        #auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--wa-bg); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        :root { --wa-bg: #0b141a; --wa-header: #202c33; --wa-text: #e9edef; --wa-teal: #00a884; --wa-msg-my: #005c4b; --wa-msg-other: #202c33; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--wa-bg); margin: 0; color: var(--wa-text); height: 100vh; overflow: hidden; }
+        .header-main { background: var(--wa-header); padding: 15px 15px 0; position: sticky; top: 0; z-index: 10; }
+        .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .tabs { display: flex; text-align: center; font-size: 14px; font-weight: bold; color: #8696a0; text-transform: uppercase; }
+        .tab { flex: 1; padding: 12px 0; border-bottom: 3px solid transparent; }
+        .tab.active { color: var(--wa-teal); border-bottom: 3px solid var(--wa-teal); }
+        #contacts-list { overflow-y: auto; height: calc(100vh - 100px); }
+        .chat-item { display: flex; padding: 12px 16px; gap: 15px; border-bottom: 0.5px solid #222d34; }
+        .avatar-circle { width: 50px; height: 50px; border-radius: 50%; background: #6a7175; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .chat-details { flex: 1; border-bottom: 0.5px solid #222d34; padding-bottom: 10px; }
+        #chat-screen { display: none; position: fixed; inset: 0; background: #0b141a url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); z-index: 100; flex-direction: column; }
+        .chat-nav { background: var(--wa-header); padding: 10px; display: flex; align-items: center; gap: 10px; }
+        .msg-container { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 5px; }
+        .bubble { max-width: 75%; padding: 8px 12px 18px; border-radius: 8px; font-size: 15px; position: relative; }
+        .my { align-self: flex-end; background: var(--wa-msg-my); }
+        .other { align-self: flex-start; background: var(--wa-msg-other); }
+        .msg-time { position: absolute; bottom: 4px; right: 8px; font-size: 10px; opacity: 0.6; }
+        .footer-chat { background: #1f2c33; padding: 10px; display: flex; align-items: center; gap: 10px; }
+        #msg-input { flex: 1; background: #2a3942; border: none; padding: 12px; border-radius: 25px; color: white; outline: none; }
+        .fab { position: fixed; bottom: 25px; right: 20px; width: 55px; height: 55px; border-radius: 50%; background: var(--wa-teal); border: none; color: white; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        #auth-screen { position: fixed; inset: 0; background: var(--wa-bg); z-index: 1000; display: flex; align-items: center; justify-content: center; text-align: center; }
     </style>
 </head>
 <body>
 
-<div id="auth-overlay">
-    <div style="text-align:center; width: 80%;">
-        <img src="Logo.jpeg" style="width:80px; border-radius:20px; margin-bottom:20px;">
-        <h2 style="margin-bottom:30px;">WhatsApp Butterfly</h2>
-        <input type="tel" id="phone" style="width:100%; margin-bottom:15px;">
+<div id="auth-screen">
+    <div style="width: 85%;">
+        <img src="Logo.jpeg" style="width:80px; border-radius:20px; margin-bottom:15px;">
+        <h2>WhatsApp Butterfly</h2>
+        <input type="tel" id="phone" style="width:100%; margin-bottom:10px;">
         <div id="recaptcha-container"></div>
-        <input type="text" id="otp-input" placeholder="Código de 6 dígitos" style="display:none; width:100%; padding:12px; background:#2a3942; border:none; color:white; border-radius:10px; margin-bottom:15px; text-align:center;">
-        <button id="btn-login" style="width:100%; padding:15px; background:#00a884; border:none; color:white; font-weight:bold; border-radius:10px; cursor:pointer;">ACEPTAR Y CONTINUAR</button>
+        <input type="text" id="otp-input" placeholder="Código de 6 dígitos" style="display:none; width:100%; padding:12px; background:#2a3942; border:none; color:white; border-radius:8px; margin-bottom:15px; text-align:center;">
+        <button id="btn-login" style="width:100%; padding:15px; background:var(--wa-teal); border:none; color:white; font-weight:bold; border-radius:8px;">COMENZAR</button>
     </div>
 </div>
 
-<div class="top-nav">
-    <div class="top-bar">
-        <span style="font-size:22px; font-weight:500; color:#8696a0;">WhatsApp</span>
-        <div style="display:flex; gap:20px; font-size:18px; color:#8696a0;"><span>🔍</span><span>⋮</span></div>
-    </div>
-    <div class="tabs">
-        <div class="tab" style="max-width:40px;">📷</div>
-        <div class="tab active">Chats</div>
-        <div class="tab">Estados</div>
-        <div class="tab">Llamadas</div>
-    </div>
+<div class="header-main">
+    <div class="top-row"><span style="color:#8696a0; font-size:20px;">WhatsApp</span></div>
+    <div class="tabs"><div class="tab">📷</div><div class="tab active">Chats</div><div class="tab">Estados</div><div class="tab">Llamadas</div></div>
 </div>
 
-<div id="main-container">
-    <div id="contacts-list"></div>
-</div>
-
-<button class="fab" id="add-contact">+</button>
+<div id="contacts-list"></div>
+<button class="fab" id="new-chat">+</button>
 
 <div id="chat-screen">
-    <div class="chat-header">
-        <span id="close-chat" style="font-size:24px; cursor:pointer;">←</span>
-        <div class="profile-pic" id="header-pic" style="width:35px; height:35px; font-size:14px; margin-right:8px;"></div>
-        <div style="flex-grow:1;">
-            <div id="chat-title" style="font-weight:500;">Nombre</div>
-            <div style="font-size:12px; color:#8696a0;">en línea</div>
-        </div>
-        <div style="display:flex; gap:20px; color:#8696a0;"><span>📹</span><span>📞</span><span>⋮</span></div>
+    <div class="chat-nav">
+        <span id="close-chat" style="font-size:24px;">←</span>
+        <div class="avatar-circle" style="width:35px; height:35px; font-size:14px;">👤</div>
+        <div id="chat-title" style="flex:1; font-weight:500;">Nombre</div>
     </div>
-    <div class="msg-area" id="msg-area"></div>
-    <div class="input-box">
-        <span>😊</span>
+    <div class="msg-container" id="msg-list"></div>
+    <div class="footer-chat">
         <input type="text" id="msg-input" placeholder="Mensaje">
-        <span id="btn-send" style="color:#00a884; font-size:24px; cursor:pointer;">➤</span>
+        <button id="send-btn" style="background:none; border:none; color:var(--wa-teal); font-size:24px;">➤</button>
     </div>
 </div>
 
@@ -114,20 +86,15 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-
     let currentChatId = null, confirmationResult = null;
+
     const iti = window.intlTelInput(document.querySelector("#phone"), { initialCountry: "py", separateDialCode: true });
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            document.getElementById('auth-overlay').style.display = 'none';
-            loadContacts();
-        }
-    });
+    onAuthStateChanged(auth, (user) => { if (user) { document.getElementById('auth-screen').style.display = 'none'; loadContacts(); } });
 
     document.getElementById('btn-login').onclick = async () => {
         const btn = document.getElementById('btn-login');
-        if (btn.innerText === "ACEPTAR Y CONTINUAR") {
+        if (btn.innerText === "COMENZAR") {
             const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'invisible' });
             confirmationResult = await signInWithPhoneNumber(auth, iti.getNumber(), verifier);
             document.getElementById('otp-input').style.display = 'block';
@@ -137,59 +104,50 @@
         }
     };
 
-    document.getElementById('add-contact').onclick = async () => {
-        const num = prompt("Número de contacto (+595...):");
-        if (num) {
-            await addDoc(collection(db, "contacts"), {
-                owner: auth.currentUser.phoneNumber,
-                contactNum: num,
-                name: num,
-                lastMsg: "Nuevo chat"
-            });
-        }
+    document.getElementById('new-chat').onclick = async () => {
+        const num = prompt("Número (+595...):");
+        if (num) await addDoc(collection(db, "contacts"), { owner: auth.currentUser.phoneNumber, name: num, contactNum: num });
     };
 
     function loadContacts() {
-        const q = query(collection(db, "contacts"), where("owner", "==", auth.currentUser.phoneNumber));
-        onSnapshot(q, (snapshot) => {
+        onSnapshot(query(collection(db, "contacts"), where("owner", "==", auth.currentUser.phoneNumber)), (snap) => {
             const list = document.getElementById('contacts-list');
             list.innerHTML = "";
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const row = document.createElement('div');
-                row.className = 'chat-row';
-                row.innerHTML = `<div class="profile-pic">👤</div><div class="chat-info"><h4>${data.name}</h4><p>${data.lastMsg}</p></div>`;
-                row.onclick = () => openChat(data.contactNum);
-                list.appendChild(row);
+            snap.forEach(doc => {
+                const d = doc.data();
+                const div = document.createElement('div');
+                div.className = 'chat-item';
+                div.innerHTML = `<div class="avatar-circle">👤</div><div class="chat-details"><h4>${d.name}</h4><p style="color:#8696a0; font-size:13px;">Toca para chatear</p></div>`;
+                div.onclick = () => openChat(d.contactNum);
+                list.appendChild(div);
             });
         });
     }
 
-    function openChat(num) {
+    window.openChat = (num) => {
         currentChatId = [auth.currentUser.phoneNumber, num].sort().join("_");
         document.getElementById('chat-screen').style.display = 'flex';
         document.getElementById('chat-title').innerText = num;
-        document.getElementById('header-pic').innerText = "👤";
         loadMessages();
-    }
+    };
 
     document.getElementById('close-chat').onclick = () => document.getElementById('chat-screen').style.display = 'none';
 
     function loadMessages() {
-        const q = query(collection(db, "messages"), where("chatId", "==", currentChatId), orderBy("timestamp", "asc"));
-        onSnapshot(q, (snapshot) => {
-            const area = document.getElementById('msg-area');
-            area.innerHTML = "";
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const isMe = data.sender === auth.currentUser.phoneNumber;
-                area.innerHTML += `<div class="bubble ${isMe ? 'my' : 'other'}">${data.text}</div>`;
+        onSnapshot(query(collection(db, "messages"), where("chatId", "==", currentChatId), orderBy("timestamp", "asc")), (snap) => {
+            const list = document.getElementById('msg-list');
+            list.innerHTML = "";
+            snap.forEach(doc => {
+                const d = doc.data();
+                const isMe = d.sender === auth.currentUser.phoneNumber;
+                const time = d.timestamp ? new Date(d.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+                list.innerHTML += `<div class="bubble ${isMe ? 'my' : 'other'}">${d.text}<span class="msg-time">${time}</span></div>`;
             });
-            area.scrollTop = area.scrollHeight;
+            list.scrollTop = list.scrollHeight;
         });
     }
 
-    document.getElementById('btn-send').onclick = async () => {
+    document.getElementById('send-btn').onclick = async () => {
         const input = document.getElementById('msg-input');
         if (!input.value.trim()) return;
         await addDoc(collection(db, "messages"), { chatId: currentChatId, sender: auth.currentUser.phoneNumber, text: input.value, timestamp: serverTimestamp() });
