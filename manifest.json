@@ -1,10 +1,10 @@
 {
-  "name": "BUTTERFLY Luxury",
-  "short_name": "BUTTERFLY",
+  "name": "BUTTERFLY",
+  "short_name": "Butterfly",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#121212",
-  "theme_color": "#9b8a78",
+  "background_color": "#0b141a",
+  "theme_color": "#00a884",
   "icons": [
     {
       "src": "Logo.jpeg",
