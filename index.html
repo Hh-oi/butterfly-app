@@ -4,94 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BUTTERFLY</title>
-    <!-- Configuración para App instalable -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="Logo.jpeg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
     <style>
-        :root { 
-            --wa-bg: #0b141a; --wa-header: #202c33; --wa-teal: #00a884; 
-            --wa-text: #e9edef; --wa-msg-my: #005c4b; --wa-msg-other: #233138;
-        }
-        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--wa-bg); margin: 0; color: var(--wa-text); overflow: hidden; height: 100vh; }
-
-        /* HEADER CON NOMBRE E ICONO */
-        .header-main { background: var(--wa-header); padding: 15px 15px 10px; border-bottom: 1px solid #222d34; }
-        .header-content { display: flex; align-items: center; justify-content: space-between; }
-        .brand-section { display: flex; align-items: center; gap: 12px; }
-        .app-logo { width: 35px; height: 35px; border-radius: 8px; object-fit: cover; }
-        .app-title { font-size: 22px; font-weight: 600; color: #8696a0; letter-spacing: 0.5px; }
+        :root { --wa-bg: #0b141a; --wa-header: #202c33; --wa-teal: #00a884; --wa-text: #e9edef; --wa-msg-my: #005c4b; --wa-msg-other: #233138; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--wa-bg); margin: 0; color: var(--wa-text); height: 100vh; display: flex; flex-direction: column; }
+        
+        /* HEADER BUTTERFLY */
+        .header-main { background: var(--wa-header); padding: 15px; border-bottom: 1px solid #222d34; display: flex; align-items: center; gap: 12px; }
+        .app-logo { width: 35px; height: 35px; border-radius: 8px; }
+        .app-title { font-size: 20px; font-weight: 600; color: #8696a0; }
 
         /* LISTA DE CHATS */
-        .chat-list { height: calc(100vh - 70px); overflow-y: auto; }
-        .chat-card { display: flex; align-items: center; padding: 12px 16px; gap: 15px; border-bottom: 0.5px solid #222d34; transition: 0.2s; }
-        .chat-card:active { background: #202c33; }
-        .avatar-box { width: 50px; height: 50px; border-radius: 50%; background: #6a7175; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; }
-        .chat-info { flex: 1; }
-        .chat-top { display: flex; justify-content: space-between; margin-bottom: 4px; }
-        .chat-top h4 { margin: 0; font-size: 16px; font-weight: 500; }
-        .chat-time { font-size: 12px; color: #8696a0; }
-        .last-msg { font-size: 13px; color: #8696a0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #chat-list { flex: 1; overflow-y: auto; }
+        .chat-card { display: flex; align-items: center; padding: 12px 16px; gap: 15px; border-bottom: 0.5px solid #222d34; }
+        .pfp { width: 50px; height: 50px; border-radius: 50%; background: #6a7175; overflow: hidden; }
+        .pfp img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* VISTA DE CHAT */
+        /* VISTA CHAT */
         #chat-view { display: none; position: fixed; inset: 0; background: #0b141a url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); z-index: 100; flex-direction: column; }
-        .chat-nav { background: var(--wa-header); padding: 10px; display: flex; align-items: center; gap: 10px; }
-        .msg-scroll { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 5px; }
-        .bubble { max-width: 75%; padding: 8px 12px 18px; border-radius: 10px; font-size: 15px; position: relative; }
-        .my { align-self: flex-end; background: var(--wa-msg-my); border-top-right-radius: 2px; }
-        .other { align-self: flex-start; background: var(--wa-msg-other); border-top-left-radius: 2px; }
-        .msg-time { position: absolute; bottom: 4px; right: 8px; font-size: 10px; opacity: 0.6; }
+        .msg-scroll { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+        .bubble { max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 15px; position: relative; word-wrap: break-word; }
+        .my { align-self: flex-end; background: var(--wa-msg-my); }
+        .other { align-self: flex-start; background: var(--wa-msg-other); }
 
         .input-area { background: #1f2c33; padding: 10px; display: flex; align-items: center; gap: 10px; }
         #msg-field { flex: 1; background: #2a3942; border: none; padding: 12px; border-radius: 25px; color: white; outline: none; }
-        .fab { position: fixed; bottom: 25px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--wa-teal); border: none; color: white; font-size: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); z-index: 90; }
-
-        /* PANTALLA DE ACCESO */
+        .fab { position: fixed; bottom: 25px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--wa-teal); border: none; color: white; font-size: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
         #login-screen { position: fixed; inset: 0; background: var(--wa-bg); z-index: 1000; display: flex; align-items: center; justify-content: center; text-align: center; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
-    <div style="width: 85%; max-width: 320px;">
-        <img src="Logo.jpeg" style="width:90px; border-radius:20px; margin-bottom:15px;">
-        <h2 style="letter-spacing: 1px;">BUTTERFLY</h2>
-        <input type="tel" id="phone-input" style="width:100%;">
+    <div style="width: 85%;">
+        <img src="Logo.jpeg" style="width:80px; border-radius:20px; margin-bottom:15px;">
+        <h2>BUTTERFLY</h2>
+        <input type="tel" id="phone-input">
         <div id="recaptcha-container"></div>
-        <input type="text" id="otp-input" placeholder="Código de verificación" style="display:none; width:100%; padding:12px; margin: 15px 0; background:#2a3942; border:none; color:white; border-radius:8px; text-align:center;">
-        <button id="login-btn" style="width:100%; padding:15px; background:var(--wa-teal); border:none; color:white; font-weight:bold; border-radius:8px; cursor:pointer;">COMENZAR</button>
+        <input type="text" id="otp-input" placeholder="Código SMS" style="display:none; width:100%; padding:12px; margin: 15px 0; background:#2a3942; border:none; color:white; border-radius:8px;">
+        <button id="login-btn" style="width:100%; padding:15px; background:var(--wa-teal); color:white; border:none; border-radius:8px; font-weight:bold;">INGRESAR</button>
     </div>
 </div>
 
 <div class="header-main">
-    <div class="header-content">
-        <div class="brand-section">
-            <img src="Logo.jpeg" alt="Butterfly Icon" class="app-logo">
-            <span class="app-title">Butterfly</span>
-        </div>
-        <div style="display:flex; gap:18px; color:#8696a0; font-size:18px;"><span>🔍</span><span>⋮</span></div>
-    </div>
+    <img src="Logo.jpeg" class="app-logo">
+    <span class="app-title">Butterfly</span>
 </div>
 
-<div class="chat-list" id="chat-list">
-    <!-- Chats dinámicos -->
-</div>
-
+<div id="chat-list"></div>
 <button class="fab" id="new-chat">+</button>
 
 <div id="chat-view">
-    <div class="chat-nav">
-        <span id="back-to-list" style="font-size:24px; cursor:pointer;">←</span>
-        <div class="avatar-box" style="width:38px; height:38px; font-size:14px;">👤</div>
+    <div class="header-main">
+        <span id="close-chat" style="cursor:pointer; font-size:24px;">←</span>
+        <div class="pfp" style="width:35px; height:35px;"><img src="Logo.jpeg"></div>
         <div style="flex:1;">
-            <div id="active-chat-name" style="font-weight:500;">Chat</div>
-            <div style="font-size:11px; color:#00a884;">en línea</div>
+            <div id="active-name" style="font-weight:500;">Chat</div>
+            <div id="status-label" style="font-size:11px; color:#00a884;">conectado</div>
         </div>
     </div>
     <div class="msg-scroll" id="msg-scroll"></div>
     <div class="input-area">
-        <input type="text" id="msg-field" placeholder="Mensaje">
+        <input type="text" id="msg-field" placeholder="Escribe un mensaje...">
         <button id="send-btn" style="background:none; border:none; color:var(--wa-teal); font-size:26px;">➤</button>
     </div>
 </div>
@@ -100,7 +76,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, where, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCpbEqoc9-lgVna4c8SsdUimZLQGjSN3gE",
@@ -114,15 +90,22 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    let activeChatId = null, confirmation = null;
+    let currentChat = null, confirmation = null;
 
     const iti = window.intlTelInput(document.querySelector("#phone-input"), { initialCountry: "py", separateDialCode: true });
 
-    onAuthStateChanged(auth, (user) => { if (user) { document.getElementById('login-screen').style.display = 'none'; initApp(); } });
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById('login-screen').style.display = 'none';
+            // Guardar usuario en DB para que otros lo vean "En línea"
+            setDoc(doc(db, "users", user.phoneNumber), { status: "online", lastSeen: serverTimestamp() }, { merge: true });
+            loadChats();
+        }
+    });
 
     document.getElementById('login-btn').onclick = async () => {
         const btn = document.getElementById('login-btn');
-        if (btn.innerText === "COMENZAR") {
+        if (btn.innerText === "INGRESAR") {
             const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'invisible' });
             confirmation = await signInWithPhoneNumber(auth, iti.getNumber(), verifier);
             document.getElementById('otp-input').style.display = 'block';
@@ -133,54 +116,54 @@
     };
 
     document.getElementById('new-chat').onclick = async () => {
-        const num = prompt("Número (+595...):");
-        if (num) await addDoc(collection(db, "contacts"), { owner: auth.currentUser.phoneNumber, name: num, contactNum: num });
+        const num = prompt("Número del contacto (+595...):");
+        if (num) await addDoc(collection(db, "contacts"), { owner: auth.currentUser.phoneNumber, name: num, phone: num });
     };
 
-    function initApp() {
+    function loadChats() {
         onSnapshot(query(collection(db, "contacts"), where("owner", "==", auth.currentUser.phoneNumber)), (snap) => {
             const list = document.getElementById('chat-list');
             list.innerHTML = "";
-            snap.forEach(doc => {
-                const d = doc.data();
-                list.innerHTML += `
-                    <div class="chat-card" onclick="openChat('${d.contactNum}')">
-                        <div class="avatar-box">👤</div>
-                        <div class="chat-info">
-                            <div class="chat-top"><h4>${d.name}</h4><span class="chat-time">9:41</span></div>
-                            <div class="last-msg">Toca para chatear en Butterfly</div>
-                        </div>
-                    </div>`;
+            snap.forEach(d => {
+                const data = d.data();
+                list.innerHTML += `<div class="chat-card" onclick="openChat('${data.phone}')">
+                    <div class="pfp"><img src="Logo.jpeg"></div>
+                    <div><h4>${data.name}</h4><p style="font-size:12px;color:#8696a0;">Toca para hablar</p></div>
+                </div>`;
             });
         });
     }
 
-    window.openChat = (num) => {
-        activeChatId = [auth.currentUser.phoneNumber, num].sort().join("_");
+    window.openChat = (phone) => {
+        currentChat = [auth.currentUser.phoneNumber, phone].sort().join("_");
         document.getElementById('chat-view').style.display = 'flex';
-        document.getElementById('active-chat-name').innerText = num;
-        loadMessages();
-    };
-
-    document.getElementById('back-to-list').onclick = () => document.getElementById('chat-view').style.display = 'none';
-
-    function loadMessages() {
-        onSnapshot(query(collection(db, "messages"), where("chatId", "==", activeChatId), orderBy("timestamp", "asc")), (snap) => {
+        document.getElementById('active-name').innerText = phone;
+        
+        // Cargar mensajes con persistencia real
+        const q = query(collection(db, "messages"), where("chatId", "==", currentChat), orderBy("timestamp", "asc"));
+        onSnapshot(q, (snap) => {
             const scroll = document.getElementById('msg-scroll');
             scroll.innerHTML = "";
-            snap.forEach(doc => {
-                const d = doc.data();
-                const isMe = d.sender === auth.currentUser.phoneNumber;
-                scroll.innerHTML += `<div class="bubble ${isMe ? 'my' : 'other'}">${d.text}<span class="msg-time">10:00</span></div>`;
+            snap.forEach(m => {
+                const msg = m.data();
+                const isMe = msg.sender === auth.currentUser.phoneNumber;
+                scroll.innerHTML += `<div class="bubble ${isMe ? 'my' : 'other'}">${msg.text}</div>`;
             });
             scroll.scrollTop = scroll.scrollHeight;
         });
-    }
+    };
+
+    document.getElementById('close-chat').onclick = () => document.getElementById('chat-view').style.display = 'none';
 
     document.getElementById('send-btn').onclick = async () => {
         const f = document.getElementById('msg-field');
         if (!f.value.trim()) return;
-        await addDoc(collection(db, "messages"), { chatId: activeChatId, sender: auth.currentUser.phoneNumber, text: f.value, timestamp: serverTimestamp() });
+        await addDoc(collection(db, "messages"), {
+            chatId: currentChat,
+            sender: auth.currentUser.phoneNumber,
+            text: f.value,
+            timestamp: serverTimestamp()
+        });
         f.value = "";
     };
 </script>
