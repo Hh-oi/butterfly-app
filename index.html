@@ -7,41 +7,43 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
     <style>
         :root { --bg: #121212; --accent: #9b8a78; --card: #1e1e1e; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; color: white; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; color: white; overflow: hidden; }
         .login-card { background: var(--card); padding: 40px 30px; border-radius: 30px; text-align: center; width: 85%; max-width: 400px; box-shadow: 0 15px 35px rgba(0,0,0,0.7); }
-        .logo { width: 80px; height: 80px; border-radius: 20px; margin-bottom: 15px; border: 1.5px solid #333; }
+        .logo { width: 80px; height: 80px; border-radius: 20px; margin-bottom: 15px; border: 1.5px solid #333; object-fit: cover; }
         .iti { width: 100%; margin-bottom: 20px; color: black; }
-        #phone, #otp-input, #msg-input { width: 100%; height: 50px; border-radius: 12px; border: 1px solid #444; background: #2a2a2a; color: white; font-size: 16px; box-sizing: border-box; }
+        #phone, #otp-input, #msg-input { width: 100%; height: 50px; border-radius: 12px; border: 1px solid #444; background: #2a2a2a; color: white; font-size: 16px; box-sizing: border-box; padding: 0 15px; }
         #phone { padding-left: 90px !important; }
-        .btn-primary { background: var(--accent); color: white; border: none; width: 100%; padding: 16px; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        .btn-primary { background: var(--accent); color: white; border: none; width: 100%; padding: 16px; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+        .btn-primary:active { transform: scale(0.98); opacity: 0.8; }
         
         /* Contenedor de Chat */
-        #chat-container { display: none; flex-direction: column; height: 400px; }
-        #messages { flex-grow: 1; overflow-y: auto; text-align: left; margin-bottom: 15px; padding: 10px; background: #0b0b0b; border-radius: 15px; border: 1px solid #333; }
-        .msg-bubble { margin-bottom: 10px; padding: 8px 12px; border-radius: 10px; background: #262626; font-size: 14px; }
-        .msg-user { color: var(--accent); font-weight: bold; font-size: 11px; display: block; }
+        #chat-container { display: none; flex-direction: column; height: 450px; width: 100%; }
+        #messages { flex-grow: 1; overflow-y: auto; text-align: left; margin-bottom: 15px; padding: 15px; background: #0b0b0b; border-radius: 15px; border: 1px solid #333; }
+        .msg-bubble { margin-bottom: 12px; padding: 10px 14px; border-radius: 15px; background: #262626; font-size: 14px; line-height: 1.4; border-bottom-left-radius: 2px; }
+        .msg-user { color: var(--accent); font-weight: bold; font-size: 11px; display: block; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
 <div class="login-card">
     <div id="auth-section">
-        <img src="Logo.jpeg" class="logo">
+        <img src="Logo.jpeg" class="logo" alt="Butterfly Logo">
         <h2>BUTTERFLY</h2>
-        <div style="color: #777; font-size: 12px; margin-bottom: 25px;">DIGITAL LUXURY</div>
+        <div style="color: #777; font-size: 12px; margin-bottom: 25px; letter-spacing: 2px;">DIGITAL LUXURY</div>
         
         <input type="tel" id="phone">
+        <!-- Contenedor para reCAPTCHA Invisible -->
         <div id="recaptcha-container"></div>
+        
         <input type="text" id="otp-input" placeholder="Código de 6 dígitos" maxlength="6" style="display:none; text-align:center; letter-spacing:4px; margin-top:10px;">
-        <button class="btn-primary" id="btn-action" onclick="processLogin()">Continuar</button>
+        <button class="btn-primary" id="btn-action">Continuar</button>
     </div>
 
-    <!-- SECCIÓN DE CHAT -->
     <div id="chat-container">
         <div id="messages"></div>
-        <div style="display:flex; gap: 5px;">
+        <div style="display:flex; gap: 8px;">
             <input type="text" id="msg-input" placeholder="Escribe un mensaje...">
-            <button onclick="sendMsg()" style="background:var(--accent); border:none; border-radius:10px; padding:0 15px; color:white; cursor:pointer;">↑</button>
+            <button id="btn-send" style="background:var(--accent); border:none; border-radius:12px; width: 50px; color:white; cursor:pointer; font-size: 20px;">↑</button>
         </div>
     </div>
 </div>
@@ -65,47 +67,94 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const iti = window.intlTelInput(document.querySelector("#phone"), {
+    const phoneInput = document.querySelector("#phone");
+    const iti = window.intlTelInput(phoneInput, {
         initialCountry: "py",
         separateDialCode: true,
         utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
     });
 
     let step = 1;
+    let confirmationResult = null;
 
-    window.processLogin = async () => {
-        const btn = document.getElementById('btn-action');
+    // Inicializar reCAPTCHA Invisible correctamente
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        'size': 'invisible'
+    });
+
+    const btnAction = document.getElementById('btn-action');
+
+    btnAction.addEventListener('click', async () => {
         if (step === 1) {
             const phoneNumber = iti.getNumber();
-            window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'invisible' });
+            if (!phoneNumber) return alert("Ingresa un número válido");
+
             try {
-                btn.innerText = "Enviando...";
-                window.confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
+                btnAction.disabled = true;
+                btnAction.innerText = "Enviando...";
+                
+                confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
+                
                 document.getElementById('otp-input').style.display = 'block';
-                document.getElementById('phone').style.display = 'none';
-                btn.innerText = "Verificar Código";
+                phoneInput.style.display = 'none';
+                // Ocultar el contenedor de la bandera de intl-tel-input
+                document.querySelector(".iti").style.display = 'none';
+                
+                btnAction.disabled = false;
+                btnAction.innerText = "Verificar Código";
                 step = 2;
-            } catch (e) { alert("Error: " + e.message); btn.innerText = "Continuar"; }
+            } catch (e) {
+                console.error(e);
+                alert("Error al enviar SMS: " + e.message);
+                btnAction.disabled = false;
+                btnAction.innerText = "Continuar";
+                // Reiniciar reCAPTCHA si falla
+                window.recaptchaVerifier.render().then(widgetId => {
+                    grecaptcha.reset(widgetId);
+                });
+            }
         } else {
             const code = document.getElementById('otp-input').value;
-            window.confirmationResult.confirm(code).then(() => {
+            if (code.length !== 6) return alert("El código debe tener 6 dígitos");
+
+            try {
+                btnAction.disabled = true;
+                btnAction.innerText = "Verificando...";
+                await confirmationResult.confirm(code);
+                
                 document.getElementById('auth-section').style.display = 'none';
                 document.getElementById('chat-container').style.display = 'flex';
                 loadMessages();
-            }).catch(() => alert("Código incorrecto"));
+            } catch (e) {
+                alert("Código incorrecto o expirado");
+                btnAction.disabled = false;
+                btnAction.innerText = "Verificar Código";
+            }
         }
-    };
+    });
 
     window.sendMsg = async () => {
         const input = document.getElementById('msg-input');
         if (!input.value.trim()) return;
-        await addDoc(collection(db, "chats"), {
-            text: input.value,
-            user: auth.currentUser.phoneNumber,
-            timestamp: serverTimestamp()
-        });
-        input.value = "";
+        
+        try {
+            await addDoc(collection(db, "chats"), {
+                text: input.value,
+                user: auth.currentUser.phoneNumber,
+                timestamp: serverTimestamp()
+            });
+            input.value = "";
+        } catch (e) {
+            console.error("Error al enviar:", e);
+        }
     };
+
+    document.getElementById('btn-send').addEventListener('click', window.sendMsg);
+    
+    // Enviar con la tecla Enter
+    document.getElementById('msg-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') window.sendMsg();
+    });
 
     function loadMessages() {
         const q = query(collection(db, "chats"), orderBy("timestamp", "asc"));
@@ -114,10 +163,11 @@
             msgDiv.innerHTML = "";
             snapshot.forEach((doc) => {
                 const data = doc.data();
+                const safeText = data.text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
                 msgDiv.innerHTML += `
                     <div class="msg-bubble">
                         <span class="msg-user">${data.user}</span>
-                        ${data.text}
+                        ${safeText}
                     </div>`;
             });
             msgDiv.scrollTop = msgDiv.scrollHeight;
