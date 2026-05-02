@@ -4,71 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BUTTERFLY</title>
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="apple-touch-icon" href="Logo.jpeg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
     <style>
         :root { --wa-bg: #0b141a; --wa-header: #202c33; --wa-teal: #00a884; --wa-text: #e9edef; --wa-msg-my: #005c4b; --wa-msg-other: #233138; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--wa-bg); margin: 0; color: var(--wa-text); height: 100vh; display: flex; flex-direction: column; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--wa-bg); margin: 0; color: var(--wa-text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
-        /* HEADER BUTTERFLY */
-        .header-main { background: var(--wa-header); padding: 15px; border-bottom: 1px solid #222d34; display: flex; align-items: center; gap: 12px; }
-        .app-logo { width: 35px; height: 35px; border-radius: 8px; }
-        .app-title { font-size: 20px; font-weight: 600; color: #8696a0; }
+        /* BARRA SUPERIOR */
+        .app-bar { background: var(--wa-header); padding: 15px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #222d34; }
+        .logo-img { width: 38px; height: 38px; border-radius: 10px; object-fit: cover; }
+        .brand-name { font-size: 22px; font-weight: 600; color: #8696a0; }
 
         /* LISTA DE CHATS */
         #chat-list { flex: 1; overflow-y: auto; }
-        .chat-card { display: flex; align-items: center; padding: 12px 16px; gap: 15px; border-bottom: 0.5px solid #222d34; }
-        .pfp { width: 50px; height: 50px; border-radius: 50%; background: #6a7175; overflow: hidden; }
-        .pfp img { width: 100%; height: 100%; object-fit: cover; }
+        .contact-card { display: flex; align-items: center; padding: 14px 16px; gap: 15px; border-bottom: 0.5px solid #222d34; cursor: pointer; }
+        .pfp-circle { width: 50px; height: 50px; border-radius: 50%; background: #6a7175; overflow: hidden; }
+        .pfp-circle img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* VISTA CHAT */
-        #chat-view { display: none; position: fixed; inset: 0; background: #0b141a url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); z-index: 100; flex-direction: column; }
-        .msg-scroll { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
-        .bubble { max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 15px; position: relative; word-wrap: break-word; }
+        /* PANTALLA DE CHAT */
+        #chat-screen { display: none; position: fixed; inset: 0; background: #0b141a url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); z-index: 100; flex-direction: column; }
+        .msg-box { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+        .bubble { max-width: 78%; padding: 8px 12px; border-radius: 10px; font-size: 15px; position: relative; word-wrap: break-word; }
         .my { align-self: flex-end; background: var(--wa-msg-my); }
         .other { align-self: flex-start; background: var(--wa-msg-other); }
 
-        .input-area { background: #1f2c33; padding: 10px; display: flex; align-items: center; gap: 10px; }
-        #msg-field { flex: 1; background: #2a3942; border: none; padding: 12px; border-radius: 25px; color: white; outline: none; }
-        .fab { position: fixed; bottom: 25px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--wa-teal); border: none; color: white; font-size: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
-        #login-screen { position: fixed; inset: 0; background: var(--wa-bg); z-index: 1000; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .input-bar { background: #1f2c33; padding: 10px; display: flex; align-items: center; gap: 10px; }
+        #msg-input { flex: 1; background: #2a3942; border: none; padding: 12px 16px; border-radius: 25px; color: white; outline: none; }
+        .send-btn { color: var(--wa-teal); font-size: 26px; border: none; background: none; cursor: pointer; }
+
+        /* ACCESO */
+        #login-overlay { position: fixed; inset: 0; background: var(--wa-bg); z-index: 1000; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .fab { position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--wa-teal); color: white; border: none; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
     </style>
 </head>
 <body>
 
-<div id="login-screen">
+<div id="login-overlay">
     <div style="width: 85%;">
-        <img src="Logo.jpeg" style="width:80px; border-radius:20px; margin-bottom:15px;">
-        <h2>BUTTERFLY</h2>
-        <input type="tel" id="phone-input">
+        <img src="Logo.jpeg" style="width:100px; border-radius:20px; margin-bottom:20px;">
+        <h1 style="color:white; letter-spacing: 2px;">BUTTERFLY</h1>
+        <input type="tel" id="phone-field">
         <div id="recaptcha-container"></div>
-        <input type="text" id="otp-input" placeholder="Código SMS" style="display:none; width:100%; padding:12px; margin: 15px 0; background:#2a3942; border:none; color:white; border-radius:8px;">
-        <button id="login-btn" style="width:100%; padding:15px; background:var(--wa-teal); color:white; border:none; border-radius:8px; font-weight:bold;">INGRESAR</button>
+        <input type="text" id="otp-field" placeholder="Código de verificación" style="display:none; width:100%; padding:15px; margin: 20px 0; background:#2a3942; border:none; color:white; border-radius:10px; text-align:center;">
+        <button id="login-btn" style="width:100%; padding:15px; background:var(--wa-teal); color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">ENTRAR</button>
     </div>
 </div>
 
-<div class="header-main">
-    <img src="Logo.jpeg" class="app-logo">
-    <span class="app-title">Butterfly</span>
+<div class="app-bar">
+    <img src="Logo.jpeg" class="logo-img">
+    <span class="brand-name">Butterfly</span>
 </div>
 
 <div id="chat-list"></div>
-<button class="fab" id="new-chat">+</button>
+<button class="fab" id="add-btn">+</button>
 
-<div id="chat-view">
-    <div class="header-main">
-        <span id="close-chat" style="cursor:pointer; font-size:24px;">←</span>
-        <div class="pfp" style="width:35px; height:35px;"><img src="Logo.jpeg"></div>
+<div id="chat-screen">
+    <div class="app-bar">
+        <span id="back-btn" style="cursor:pointer; font-size:24px;">←</span>
+        <img src="Logo.jpeg" class="logo-img" style="width:32px; height:32px;">
         <div style="flex:1;">
-            <div id="active-name" style="font-weight:500;">Chat</div>
-            <div id="status-label" style="font-size:11px; color:#00a884;">conectado</div>
+            <div id="chat-user-name" style="font-weight:500;">Chat</div>
+            <div style="font-size:11px; color:var(--wa-teal);">en línea</div>
         </div>
     </div>
-    <div class="msg-scroll" id="msg-scroll"></div>
-    <div class="input-area">
-        <input type="text" id="msg-field" placeholder="Escribe un mensaje...">
-        <button id="send-btn" style="background:none; border:none; color:var(--wa-teal); font-size:26px;">➤</button>
+    <div class="msg-box" id="msg-box"></div>
+    <div class="input-bar">
+        <input type="text" id="msg-input" placeholder="Mensaje">
+        <button id="send-btn" class="send-btn">➤</button>
     </div>
 </div>
 
@@ -76,7 +78,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, where, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCpbEqoc9-lgVna4c8SsdUimZLQGjSN3gE",
@@ -90,81 +92,80 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    let currentChat = null, confirmation = null;
+    let activeChatId = null, confirmation = null;
 
-    const iti = window.intlTelInput(document.querySelector("#phone-input"), { initialCountry: "py", separateDialCode: true });
+    const iti = window.intlTelInput(document.querySelector("#phone-field"), { initialCountry: "py", separateDialCode: true });
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            document.getElementById('login-screen').style.display = 'none';
-            // Guardar usuario en DB para que otros lo vean "En línea"
-            setDoc(doc(db, "users", user.phoneNumber), { status: "online", lastSeen: serverTimestamp() }, { merge: true });
-            loadChats();
+            document.getElementById('login-overlay').style.display = 'none';
+            syncContacts();
         }
     });
 
     document.getElementById('login-btn').onclick = async () => {
         const btn = document.getElementById('login-btn');
-        if (btn.innerText === "INGRESAR") {
+        if (btn.innerText === "ENTRAR") {
             const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'invisible' });
             confirmation = await signInWithPhoneNumber(auth, iti.getNumber(), verifier);
-            document.getElementById('otp-input').style.display = 'block';
+            document.getElementById('otp-field').style.display = 'block';
             btn.innerText = "VERIFICAR";
         } else {
-            await confirmation.confirm(document.getElementById('otp-input').value);
+            await confirmation.confirm(document.getElementById('otp-field').value);
         }
     };
 
-    document.getElementById('new-chat').onclick = async () => {
+    document.getElementById('add-btn').onclick = async () => {
         const num = prompt("Número del contacto (+595...):");
         if (num) await addDoc(collection(db, "contacts"), { owner: auth.currentUser.phoneNumber, name: num, phone: num });
     };
 
-    function loadChats() {
+    function syncContacts() {
         onSnapshot(query(collection(db, "contacts"), where("owner", "==", auth.currentUser.phoneNumber)), (snap) => {
             const list = document.getElementById('chat-list');
             list.innerHTML = "";
             snap.forEach(d => {
-                const data = d.data();
-                list.innerHTML += `<div class="chat-card" onclick="openChat('${data.phone}')">
-                    <div class="pfp"><img src="Logo.jpeg"></div>
-                    <div><h4>${data.name}</h4><p style="font-size:12px;color:#8696a0;">Toca para hablar</p></div>
-                </div>`;
+                const c = d.data();
+                const card = document.createElement('div');
+                card.className = 'contact-card';
+                card.innerHTML = `<div class="pfp-circle"><img src="Logo.jpeg"></div><div><h4>${c.name}</h4><p style="font-size:12px;color:#8696a0;">Toca para hablar</p></div>`;
+                card.onclick = () => openButterflyChat(c.phone);
+                list.appendChild(card);
             });
         });
     }
 
-    window.openChat = (phone) => {
-        currentChat = [auth.currentUser.phoneNumber, phone].sort().join("_");
-        document.getElementById('chat-view').style.display = 'flex';
-        document.getElementById('active-name').innerText = phone;
+    window.openButterflyChat = (phone) => {
+        activeChatId = [auth.currentUser.phoneNumber, phone].sort().join("_");
+        document.getElementById('chat-screen').style.display = 'flex';
+        document.getElementById('chat-user-name').innerText = phone;
         
-        // Cargar mensajes con persistencia real
-        const q = query(collection(db, "messages"), where("chatId", "==", currentChat), orderBy("timestamp", "asc"));
+        // Listener de mensajes usando la colección "chats" e índice compuesto
+        const q = query(collection(db, "chats"), where("chatId", "==", activeChatId), orderBy("timestamp", "asc"));
         onSnapshot(q, (snap) => {
-            const scroll = document.getElementById('msg-scroll');
-            scroll.innerHTML = "";
+            const box = document.getElementById('msg-box');
+            box.innerHTML = "";
             snap.forEach(m => {
                 const msg = m.data();
-                const isMe = msg.sender === auth.currentUser.phoneNumber;
-                scroll.innerHTML += `<div class="bubble ${isMe ? 'my' : 'other'}">${msg.text}</div>`;
+                const isMe = msg.user === auth.currentUser.phoneNumber;
+                box.innerHTML += `<div class="bubble ${isMe ? 'my' : 'other'}">${msg.text}</div>`;
             });
-            scroll.scrollTop = scroll.scrollHeight;
+            box.scrollTop = box.scrollHeight;
         });
     };
 
-    document.getElementById('close-chat').onclick = () => document.getElementById('chat-view').style.display = 'none';
+    document.getElementById('back-btn').onclick = () => document.getElementById('chat-screen').style.display = 'none';
 
     document.getElementById('send-btn').onclick = async () => {
-        const f = document.getElementById('msg-field');
-        if (!f.value.trim()) return;
-        await addDoc(collection(db, "messages"), {
-            chatId: currentChat,
-            sender: auth.currentUser.phoneNumber,
-            text: f.value,
+        const input = document.getElementById('msg-input');
+        if (!input.value.trim()) return;
+        await addDoc(collection(db, "chats"), {
+            chatId: activeChatId, // Obligatorio para el índice
+            user: auth.currentUser.phoneNumber, // Cambiado de 'sender' a 'user' como en image_b0cbc9.png
+            text: input.value,
             timestamp: serverTimestamp()
         });
-        f.value = "";
+        input.value = "";
     };
 </script>
 </body>
