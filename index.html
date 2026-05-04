@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BUTTERFLY</title>
     
-    <!-- CONFIGURACIÓN PWA PARA INSTALACIÓN -->
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="Logo.jpeg">
     <meta name="mobile-web-app-capable" content="yes">
@@ -25,6 +24,8 @@
             --wa-gray: #8696a0; 
         }
 
+        * { box-sizing: border-box; }
+
         body { 
             font-family: 'Segoe UI', sans-serif; 
             background: var(--wa-bg); 
@@ -36,7 +37,6 @@
             overflow: hidden; 
         }
 
-        /* DISEÑO DE LOGIN REFINADO */
         #login-overlay { 
             position: fixed; 
             inset: 0; 
@@ -48,11 +48,7 @@
             text-align: center; 
         }
 
-        .login-card {
-            width: 90%;
-            max-width: 340px;
-            padding: 20px;
-        }
+        .login-card { width: 90%; max-width: 340px; padding: 20px; }
 
         .btn-teal { 
             background: var(--wa-teal); 
@@ -68,57 +64,78 @@
             box-shadow: 0 4px 10px rgba(0, 168, 132, 0.2);
         }
 
-        #phone-field { width: 100%; margin-bottom: 10px; }
+        #phone-field { width: 100%; margin-bottom: 10px; padding: 12px; background:#2a3942; border:none; color:white; border-radius:8px; }
+        
+        #main-app { display: none; flex-direction: column; height: 100vh; }
+        #main-app.active { display: flex; }
 
-        /* INTERFAZ PRINCIPAL */
         .app-bar { background: var(--wa-header); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #222d34; z-index: 100; }
         .logo-img { width: 35px; height: 35px; border-radius: 8px; object-fit: cover; }
         .brand-name { font-size: 20px; font-weight: 700; color: var(--wa-teal); }
         
         #chat-list { flex: 1; overflow-y: auto; }
         .contact-card { display: flex; align-items: center; padding: 12px 16px; gap: 15px; border-bottom: 0.5px solid #222d34; cursor: pointer; }
+        .contact-card:hover { background: #182229; }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--wa-gray); }
         
-        /* PANTALLA DE CHAT */
-        #chat-screen { display: none; position: fixed; inset: 0; background: #0b141a url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); z-index: 200; flex-direction: column; }
+        #chat-screen { display: none; position: fixed; inset: 0; background: #0b141a; z-index: 200; flex-direction: column; }
+        #chat-screen.active { display: flex; }
         .msg-box { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 4px; }
-        .bubble { max-width: 85%; padding: 8px 12px; border-radius: 10px; font-size: 15px; line-height: 1.4; }
+        .bubble { max-width: 85%; padding: 8px 12px; border-radius: 10px; font-size: 15px; line-height: 1.4; word-wrap: break-word; }
         .my { align-self: flex-end; background: var(--wa-msg-my); border-top-right-radius: 0; }
         .other { align-self: flex-start; background: var(--wa-msg-other); border-top-left-radius: 0; }
 
         .input-bar { background: var(--wa-header); padding: 10px; display: flex; align-items: center; gap: 10px; }
         #msg-input { flex: 1; background: #2a3942; border: none; padding: 12px 18px; border-radius: 25px; color: white; outline: none; }
 
-        .fab { position: fixed; bottom: 25px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--wa-teal); color: white; border: none; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 50; }
+        .fab { position: fixed; bottom: 25px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--wa-teal); color: white; border: none; font-size: 28px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 50; cursor: pointer; }
+
+        /* MODAL para agregar contacto */
+        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:500; align-items:center; justify-content:center; }
+        .modal-overlay.active { display:flex; }
+        .modal-box { background:var(--wa-header); padding:25px; border-radius:12px; width:90%; max-width:340px; }
+        .modal-box input { width:100%; padding:12px; margin:8px 0; background:#2a3942; border:none; color:white; border-radius:8px; }
+        .modal-box h3 { margin-top:0; color:var(--wa-teal); }
     </style>
 </head>
 <body>
 
+<!-- LOGIN -->
 <div id="login-overlay">
     <div class="login-card">
         <img src="Logo.jpeg" style="width:110px; height:110px; border-radius:25px; margin-bottom:20px; object-fit:cover;">
         <h1 style="color:white; margin:0; letter-spacing: 2px;">BUTTERFLY</h1>
         <p style="color:var(--wa-gray); margin-bottom:25px; font-size:14px;">Mensajería Privada</p>
         
-        <div style="margin-bottom:15px;"><input type="tel" id="phone-field"></div>
+        <div style="margin-bottom:15px;"><input type="tel" id="phone-field" placeholder="Número de teléfono"></div>
         <div id="recaptcha-container"></div>
         
-        <input type="text" id="otp-field" placeholder="Código SMS" style="display:none; width:100%; padding:14px; margin: 15px 0; background:#2a3942; border:none; color:white; border-radius:25px; text-align:center; box-sizing: border-box;">
+        <input type="text" id="otp-field" placeholder="Código SMS" style="display:none; width:100%; padding:14px; margin: 15px 0; background:#2a3942; border:none; color:white; border-radius:25px; text-align:center;">
         
-        <button id="login-btn" class="btn-teal">INGRESAR</button>
+        <input type="text" id="name-field" placeholder="Tu nombre" style="display:none; width:100%; padding:14px; margin: 10px 0; background:#2a3942; border:none; color:white; border-radius:25px; text-align:center;">
+        
+        <button id="login-btn" class="btn-teal">ENVIAR CÓDIGO</button>
+        <p id="login-msg" style="color:var(--wa-gray); font-size:12px; margin-top:10px;"></p>
     </div>
 </div>
 
-<div class="app-bar">
-    <div style="display:flex; align-items:center; gap:12px;">
-        <img src="Logo.jpeg" class="logo-img">
-        <span class="brand-name">Butterfly</span>
+<!-- APP PRINCIPAL -->
+<div id="main-app">
+    <div class="app-bar">
+        <div style="display:flex; align-items:center; gap:12px;">
+            <img src="Logo.jpeg" class="logo-img">
+            <span class="brand-name">Butterfly</span>
+        </div>
+        <div id="logout-btn" style="color:var(--wa-gray); cursor:pointer; font-size:14px;">Salir</div>
     </div>
-    <div id="dots-btn" style="color:var(--wa-gray); cursor:pointer; font-size:20px;">⋮</div>
+
+    <div id="chat-list">
+        <div class="empty-state">No tienes chats. Toca el botón + para agregar un contacto.</div>
+    </div>
+    <button class="fab" id="fab-add">+</button>
 </div>
 
-<div id="chat-list"></div>
-<button class="fab" id="fab-add">+</button>
-
+<!-- PANTALLA DE CHAT -->
 <div id="chat-screen">
     <div class="app-bar">
         <span id="back-btn" style="cursor:pointer; font-size:26px;">←</span>
@@ -127,20 +144,30 @@
     <div class="msg-box" id="msg-box"></div>
     <div class="input-bar">
         <input type="text" id="msg-input" placeholder="Escribe un mensaje..." autocomplete="off">
-        <button id="send-btn" style="background:none; border:none; color:var(--wa-teal); font-size:28px;">➤</button>
+        <button id="send-btn" style="background:none; border:none; color:var(--wa-teal); font-size:28px; cursor:pointer;">➤</button>
+    </div>
+</div>
+
+<!-- MODAL AGREGAR CONTACTO -->
+<div class="modal-overlay" id="add-modal">
+    <div class="modal-box">
+        <h3>Nuevo contacto</h3>
+        <input type="text" id="new-contact-name" placeholder="Nombre">
+        <input type="tel" id="new-contact-phone" placeholder="+595... (con código de país)">
+        <button class="btn-teal" id="save-contact-btn">Guardar</button>
+        <button style="background:none; border:none; color:var(--wa-gray); margin-top:10px; width:100%; cursor:pointer;" id="cancel-contact-btn">Cancelar</button>
     </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 <script type="module">
-    // MOTOR DE INSTALACIÓN
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').then(() => console.log("SW Activo"));
+        navigator.serviceWorker.register('./sw.js').then(() => console.log("SW Activo")).catch(e => console.log("SW error:", e));
     }
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, where, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCpbEqoc9-lgVna4c8SsdUimZLQGjSN3gE",
@@ -154,68 +181,183 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    let activeChatId = null, confirmation = null;
+    let activeChatId = null, confirmation = null, verifier = null;
 
-    const iti = window.intlTelInput(document.querySelector("#phone-field"), { initialCountry: "py", separateDialCode: true });
+    const iti = window.intlTelInput(document.querySelector("#phone-field"), { 
+        initialCountry: "py", 
+        separateDialCode: true,
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+    });
 
-    onAuthStateChanged(auth, (user) => {
+    // AUTH STATE
+    onAuthStateChanged(auth, async (user) => {
         if (user) {
-            document.getElementById('login-overlay').style.display = 'none';
-            sync();
+            // Verificar si el usuario ya tiene perfil
+            const userRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userRef);
+            
+            if (!userSnap.exists()) {
+                // Pedir nombre
+                document.getElementById('phone-field').style.display = 'none';
+                document.getElementById('otp-field').style.display = 'none';
+                document.getElementById('name-field').style.display = 'block';
+                document.getElementById('login-btn').innerText = 'GUARDAR NOMBRE';
+                document.getElementById('login-msg').innerText = 'Ingresa tu nombre para continuar';
+            } else {
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('main-app').classList.add('active');
+                sync();
+            }
         }
     });
 
+    // LOGIN BUTTON
     document.getElementById('login-btn').onclick = async () => {
-        if (!confirmation) {
-            const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'invisible' });
-            confirmation = await signInWithPhoneNumber(auth, iti.getNumber(), verifier);
-            document.getElementById('otp-field').style.display = 'block';
-        } else {
-            await confirmation.confirm(document.getElementById('otp-field').value);
+        const btn = document.getElementById('login-btn');
+        const msg = document.getElementById('login-msg');
+        
+        try {
+            // PASO 3: Guardar nombre
+            if (auth.currentUser && document.getElementById('name-field').style.display === 'block') {
+                const name = document.getElementById('name-field').value.trim();
+                if (!name) { msg.innerText = 'Ingresa un nombre válido'; return; }
+                
+                await setDoc(doc(db, "users", auth.currentUser.uid), {
+                    uid: auth.currentUser.uid,
+                    phone: auth.currentUser.phoneNumber,
+                    name: name,
+                    createdAt: serverTimestamp()
+                });
+                
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('main-app').classList.add('active');
+                sync();
+                return;
+            }
+
+            // PASO 1: Enviar SMS
+            if (!confirmation) {
+                if (!verifier) {
+                    verifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'invisible' });
+                }
+                msg.innerText = 'Enviando código...';
+                confirmation = await signInWithPhoneNumber(auth, iti.getNumber(), verifier);
+                document.getElementById('otp-field').style.display = 'block';
+                btn.innerText = 'VERIFICAR CÓDIGO';
+                msg.innerText = 'Código enviado por SMS';
+            } 
+            // PASO 2: Confirmar código
+            else {
+                const code = document.getElementById('otp-field').value.trim();
+                if (!code) { msg.innerText = 'Ingresa el código'; return; }
+                msg.innerText = 'Verificando...';
+                await confirmation.confirm(code);
+            }
+        } catch (e) {
+            msg.innerText = 'Error: ' + e.message;
+            console.error(e);
         }
     };
 
+    // LOGOUT
+    document.getElementById('logout-btn').onclick = () => {
+        signOut(auth).then(() => location.reload());
+    };
+
+    // SINCRONIZAR CONTACTOS
     function sync() {
-        onSnapshot(query(collection(db, "contacts"), where("owner", "==", auth.currentUser.phoneNumber)), (s) => {
+        const q = query(collection(db, "contacts"), where("owner", "==", auth.currentUser.uid));
+        onSnapshot(q, (s) => {
             const l = document.getElementById('chat-list');
+            if (s.empty) {
+                l.innerHTML = '<div class="empty-state">No tienes chats. Toca el botón + para agregar un contacto.</div>';
+                return;
+            }
             l.innerHTML = "";
-            s.forEach(doc => {
-                const c = doc.data();
-                l.innerHTML += `<div class="contact-card" onclick="openChat('${c.phone}')">
-                    <div style="width:48px; height:48px; border-radius:50%; background:#3b4a54; overflow:hidden;"><img src="Logo.jpeg" style="width:100%; height:100%; object-fit:cover;"></div>
-                    <div><h4 style="margin:0;">${c.name}</h4><p style="margin:0; font-size:12px; color:var(--wa-gray);">Toca para chatear</p></div>
-                </div>`;
+            s.forEach(docu => {
+                const c = docu.data();
+                const card = document.createElement('div');
+                card.className = 'contact-card';
+                card.innerHTML = `
+                    <div style="width:48px; height:48px; border-radius:50%; background:#3b4a54; overflow:hidden;">
+                        <img src="Logo.jpeg" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                    <div>
+                        <h4 style="margin:0;">${c.name}</h4>
+                        <p style="margin:0; font-size:12px; color:var(--wa-gray);">${c.phone}</p>
+                    </div>`;
+                card.onclick = () => openChat(c.phone, c.name);
+                l.appendChild(card);
             });
         });
     }
 
-    window.openChat = (phone) => {
+    // ABRIR CHAT
+    window.openChat = (phone, name) => {
         activeChatId = [auth.currentUser.phoneNumber, phone].sort().join("_");
-        document.getElementById('chat-screen').style.display = 'flex';
-        document.getElementById('chat-user-name').innerText = phone;
+        document.getElementById('chat-screen').classList.add('active');
+        document.getElementById('chat-user-name').innerText = name || phone;
+        
         const q = query(collection(db, "chats"), where("chatId", "==", activeChatId), orderBy("timestamp", "asc"));
         onSnapshot(q, (s) => {
             const b = document.getElementById('msg-box');
             b.innerHTML = "";
             s.forEach(m => {
                 const d = m.data();
-                b.innerHTML += `<div class="bubble ${d.user === auth.currentUser.phoneNumber ? 'my' : 'other'}">${d.text}</div>`;
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble ' + (d.user === auth.currentUser.phoneNumber ? 'my' : 'other');
+                bubble.innerText = d.text;
+                b.appendChild(bubble);
             });
             b.scrollTop = b.scrollHeight;
         });
     };
 
-    document.getElementById('back-btn').onclick = () => document.getElementById('chat-screen').style.display = 'none';
+    document.getElementById('back-btn').onclick = () => {
+        document.getElementById('chat-screen').classList.remove('active');
+        activeChatId = null;
+    };
 
+    // ENVIAR MENSAJE
     const send = async () => {
         const i = document.getElementById('msg-input');
-        if(!i.value.trim()) return;
-        await addDoc(collection(db, "chats"), { chatId: activeChatId, user: auth.currentUser.phoneNumber, text: i.value, timestamp: serverTimestamp() });
+        if (!i.value.trim() || !activeChatId) return;
+        await addDoc(collection(db, "chats"), { 
+            chatId: activeChatId, 
+            user: auth.currentUser.phoneNumber, 
+            text: i.value.trim(), 
+            timestamp: serverTimestamp() 
+        });
         i.value = "";
     };
 
     document.getElementById('send-btn').onclick = send;
     document.getElementById('msg-input').onkeypress = (e) => { if(e.key==='Enter') send(); };
+
+    // AGREGAR CONTACTO
+    document.getElementById('fab-add').onclick = () => {
+        document.getElementById('add-modal').classList.add('active');
+    };
+    document.getElementById('cancel-contact-btn').onclick = () => {
+        document.getElementById('add-modal').classList.remove('active');
+    };
+    document.getElementById('save-contact-btn').onclick = async () => {
+        const name = document.getElementById('new-contact-name').value.trim();
+        const phone = document.getElementById('new-contact-phone').value.trim();
+        if (!name || !phone) { alert('Completa nombre y teléfono'); return; }
+        if (!phone.startsWith('+')) { alert('El teléfono debe incluir el código de país. Ej: +595...'); return; }
+        
+        await addDoc(collection(db, "contacts"), {
+            owner: auth.currentUser.uid,
+            name: name,
+            phone: phone,
+            createdAt: serverTimestamp()
+        });
+        
+        document.getElementById('new-contact-name').value = '';
+        document.getElementById('new-contact-phone').value = '';
+        document.getElementById('add-modal').classList.remove('active');
+    };
 </script>
 </body>
 </html>
