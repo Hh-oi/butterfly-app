@@ -2,19 +2,24 @@
   "name": "BUTTERFLY",
   "short_name": "Butterfly",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#0b141a",
   "theme_color": "#00a884",
+  "description": "Mensajería privada Butterfly",
   "icons": [
     {
       "src": "Logo.jpeg",
       "sizes": "192x192",
-      "type": "image/jpeg"
+      "type": "image/jpeg",
+      "purpose": "any"
     },
     {
       "src": "Logo.jpeg",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/jpeg",
+      "purpose": "any"
     }
   ]
 }
